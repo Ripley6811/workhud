@@ -106,18 +106,22 @@ function paintBar() {
 function paintMemory(m) {
   const free = (m.total || 0) - (m.used || 0);
   const freeFrac = m.total ? free / m.total : 0;
-  $('mem-pct').textContent = m.total ? pct(freeFrac) : '--';
-  $('mem-detail').textContent = m.total ? `${bytes(free)} of ${bytes(m.total)}` : 'memory';
+  const usedFrac = m.total ? (m.used || 0) / m.total : 0;
+  // The rail reads as used%, the opposite of the expanded panel's gauges
+  // (which stay free-based) - the user wants "how full" here, at a glance.
+  $('mem-pct').textContent = m.total ? pct(usedFrac) : '--';
+  $('mem-detail').textContent = m.total ? `${bytes(m.used)} of ${bytes(m.total)}` : 'memory';
   const fill = $('mem-fill');
-  // The meter fills with what is left, so it drains as memory fills. Which axis
+  // The meter fills with what is used, so it grows as memory fills. Which axis
   // it grows along depends on the layout, so CSS reads this rather than a
   // hard-coded height.
-  fill.style.setProperty('--share', `${Math.min(100, freeFrac * 100)}%`);
+  fill.style.setProperty('--share', `${Math.min(100, usedFrac * 100)}%`);
+  // Colour still keyed off how much room is left, not how full it reads.
   fill.style.background = freeColour(freeFrac);
   // The rail is the whole memory UI now, so the detail lives in its tooltip.
   const lines = [];
   if (m.total) {
-    lines.push(`Memory: ${bytes(free)} free of ${bytes(m.total)} (${pct(freeFrac)})`);
+    lines.push(`Memory: ${bytes(m.used)} used of ${bytes(m.total)} (${pct(usedFrac)})`);
     lines.push('Click to expand');
     const heaviest = (m.processes || []).slice(0, 4);
     if (heaviest.length) {
