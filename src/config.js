@@ -23,9 +23,10 @@ const DEFAULTS = {
   maxItems: 25,
   slackMaxChannels: 25,
   slackOpenInBrowser: false,
-  hudHeight: 44,            // height of the bar itself
+  hudHeight: 44,            // thickness of the bar, whichever way it runs
   hudOpacity: 0.97,
   expanded: false,
+  vertical: false,          // stand the bar on its end against a screen edge
   hoverPeek: true,          // collapsed, hovering the bar peeks the dashboard open
   pinned: true,
   showInTaskbar: true,      // taskbar button on Windows, Dock icon on macOS

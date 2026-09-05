@@ -17,8 +17,15 @@ bar closes it again immediately. The preview is a glance: to interact with it,
 click the chevron or the rail to expand properly. A peek never overwrites the
 mode you chose, nor the saved window size.
 
+It runs either way up: a bar across the top of a wide window with the columns
+side by side, or — with **Stand the bar on its end** in Settings — a narrow strip
+down the left with the columns stacked. Collapsing and peeking then grow the
+window sideways rather than downward.
+
 Drag it anywhere, resize it from any edge, pin it on top or let it fall behind.
-Position, size and mode are remembered.
+Position, size and mode are remembered per orientation; switching orientation
+starts from a fresh default, because bounds saved for one are nonsense in the
+other.
 
 ## Running it
 

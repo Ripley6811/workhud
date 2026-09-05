@@ -48,6 +48,17 @@ const state = {
 // resting near the bottom of the primary screen, but free to be dragged anywhere.
 function defaultBounds() {
   const wa = screen.getPrimaryDisplay().workArea;
+  if (config.load().vertical) {
+    // Standing on its end: tall and narrow, resting against the left edge.
+    const height = Math.min(820, Math.max(320, wa.height - 120));
+    const width = 420;
+    return {
+      x: wa.x + 60,
+      y: wa.y + Math.round((wa.height - height) / 2),
+      width,
+      height,
+    };
+  }
   const width = Math.min(1180, Math.max(640, wa.width - 160));
   const height = 380;
   return {
@@ -71,20 +82,32 @@ function applyWindowMode() {
   const cfg = config.load();
   const b = storedBounds();
   const open = cfg.expanded || peeking;
-  // The window grows downward so the bar stays put under the pointer. Clamp to
-  // the screen it is on, or a bar parked low would open off the bottom edge.
+  // The window grows away from its top-left corner - downward when the bar runs
+  // across, rightward when it stands on end - so the bar stays put under the
+  // pointer. Clamp to the screen it is on, or a bar parked against an edge would
+  // open off the side of it.
   const area = screen.getDisplayMatching(
-    { x: b.x, y: b.y, width: b.width, height: cfg.hudHeight }
+    { x: b.x, y: b.y, width: cfg.hudHeight, height: cfg.hudHeight }
   ).workArea;
-  const room = Math.max(cfg.hudHeight, area.y + area.height - b.y - 8);
-  const height = open ? Math.min(b.height, room) : cfg.hudHeight;
+  const roomRight = Math.max(cfg.hudHeight, area.x + area.width - b.x - 8);
+  const roomBelow = Math.max(cfg.hudHeight, area.y + area.height - b.y - 8);
+
+  const width = cfg.vertical
+    ? (open ? Math.min(b.width, roomRight) : cfg.hudHeight)
+    : b.width;
+  const height = cfg.vertical
+    ? Math.min(b.height, roomBelow)
+    : (open ? Math.min(b.height, roomBelow) : cfg.hudHeight);
 
   // Windows ignores setBounds on a non-resizable window, so the resize has to
   // happen while the window still allows it. Getting this order wrong makes
   // collapsing look like a dead click: the state changes, the window does not.
   hud.setResizable(true);
-  hud.setMinimumSize(420, cfg.hudHeight);
-  hud.setBounds({ x: b.x, y: b.y, width: b.width, height });
+  hud.setMinimumSize(
+    cfg.vertical ? cfg.hudHeight : 420,
+    cfg.vertical ? 240 : cfg.hudHeight
+  );
+  hud.setBounds({ x: b.x, y: b.y, width, height });
   hud.setResizable(cfg.expanded); // a peek is transient, so not resizable
   if (process.env.WORKHUD_DEBUG) {
     console.log('[mode] want', b.width + 'x' + height, 'open', open,
@@ -111,13 +134,16 @@ function rememberBounds() {
     const cfg = config.load();
     const now = hud.getBounds();
     const kept = storedBounds();
-    // A peeked window is temporarily tall; never let that become the saved size.
+    // Only the axis the window opens along is mode specific; the other one is
+    // whatever the user dragged. A peeked window is temporarily open, so its
+    // size must never be written back as the collapsed one.
+    const open = cfg.expanded && !peeking;
     config.save({
       bounds: {
         x: now.x,
         y: now.y,
-        width: now.width,
-        height: cfg.expanded && !peeking ? now.height : kept.height,
+        width: cfg.vertical ? (open ? now.width : kept.width) : now.width,
+        height: cfg.vertical ? now.height : (open ? now.height : kept.height),
       },
     });
   }, 400);
@@ -144,8 +170,9 @@ function checkHover() {
   // Only the bar strip peeks, and it closes the moment you leave it. The
   // dashboard it reveals is a glance, not somewhere to wander into - clicking
   // is what makes it stay.
-  const onBar = p.x >= b.x && p.x < b.x + b.width
-             && p.y >= b.y && p.y < b.y + cfg.hudHeight;
+  const onBar = cfg.vertical
+    ? (p.x >= b.x && p.x < b.x + cfg.hudHeight && p.y >= b.y && p.y < b.y + b.height)
+    : (p.x >= b.x && p.x < b.x + b.width && p.y >= b.y && p.y < b.y + cfg.hudHeight);
 
   if (process.env.WORKHUD_DEBUG && onBar !== hoverLogged) {
     hoverLogged = onBar;
@@ -344,6 +371,9 @@ function registerIpc() {
   ipcMain.handle('config:save', (_e, partial) => {
     const before = config.load();
     const next = config.save(partial);
+    // Bounds saved for one orientation are nonsense in the other, so start the
+    // new one from a sensible default rather than a transposed leftover.
+    if (next.vertical !== before.vertical) config.save({ bounds: defaultBounds() });
     if (next.expanded) peeking = false;             // a real expand supersedes a peek
     if (before.expanded && !next.expanded) peekSuppressed = true;
     applyWindowMode();

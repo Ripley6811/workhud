@@ -287,10 +287,10 @@ body.expanded .preview { display: none; }
 #rail-meter i {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  height: 0;
+  height: var(--share, 0%);
   border-radius: 3px;
   background: var(--ok);
-  transition: height .4s ease, background .4s ease;
+  transition: height .4s ease, width .4s ease, background .4s ease;
 }
 
 /* vertical-rl plus a half turn reads bottom-to-top, keeping digits upright. */
@@ -308,3 +308,92 @@ body.expanded .preview { display: none; }
 }
 #mem-pct { font-weight: 600; font-size: 13px; font-variant-numeric: tabular-nums; }
 #mem-detail { color: var(--muted); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+
+
+/* ==================================================================== */
+/* Vertical layout: the same window stood on its end. The bar becomes a  */
+/* strip down the left, the columns stack instead of sitting side by     */
+/* side, and the memory rail lies along the bottom.                      */
+/* ==================================================================== */
+
+body.vertical #wrap { flex-direction: column; }
+body.vertical #main { flex-direction: row; min-height: 0; }
+
+body.vertical #bar {
+  flex: 0 0 var(--bar-h);
+  width: var(--bar-h);
+  height: auto;
+  flex-direction: column;
+  padding: 6px 0;
+  border-bottom: 0;
+}
+body.vertical.expanded #bar { border-bottom: 0; border-right: 1px solid var(--line); }
+
+body.vertical #grip { padding: 2px 0 8px; align-self: center; }
+
+/* Sized to their content and packed at the top, rather than each claiming half
+   the strip and floating in the middle of it. */
+body.vertical .seg {
+  flex: 0 0 auto;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin: 0 5px;
+  padding: 10px 0;
+  gap: 8px;
+}
+/* Upright digits, bottom-to-top labels: the same trick the rail uses. */
+body.vertical .seg .label { writing-mode: vertical-rl; transform: rotate(180deg); }
+/* There is no room for a message preview in a strip this narrow. */
+body.vertical .preview { display: none; }
+
+body.vertical .divider { flex: 0 0 1px; width: auto; height: 1px; margin: 4px 10px; }
+
+/* The tools sink to the bottom of the strip, as they sit at the far end of the
+   bar when it runs across. */
+body.vertical #tools { flex-direction: column; padding: 6px 0 0; margin-top: auto; }
+body.vertical .status {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding: 0 0 6px;
+  max-height: 6rem;
+  overflow: hidden;
+}
+
+body.vertical #dash {
+  flex-direction: column;
+  margin: 0;
+  border: 0;
+  border-left: 1px solid var(--line);
+  border-radius: 0;
+}
+
+body.vertical .col { border-left: 0; border-top: 1px solid var(--line); }
+body.vertical .col:first-child { border-top: 0; }
+/* Stacked, "narrow" means hugging its content rather than claiming an equal
+   share of the height - the memory readings are a fixed handful of rows, and
+   the two message lists want everything left over. */
+body.vertical .col.narrow { flex: 0 0 auto; }
+body.vertical .col.narrow .col-body { flex: 0 0 auto; overflow: visible; }
+
+body.vertical #rail {
+  flex: 0 0 var(--rail-w);
+  height: var(--rail-w);
+  flex-direction: row;
+  align-items: center;
+  gap: 9px;
+  padding: 0 10px;
+  border-left: 0;
+  border-top: 1px solid var(--line);
+}
+body.vertical #rail-meter { flex: 1 1 auto; align-self: center; height: 5px; }
+body.vertical #rail-meter i {
+  top: 0; bottom: 0; left: 0; right: auto;
+  height: 100%;
+  width: var(--share, 0%);
+}
+body.vertical #rail-text {
+  flex: 0 0 auto;
+  writing-mode: horizontal-tb;
+  transform: none;
+  gap: 8px;
+}

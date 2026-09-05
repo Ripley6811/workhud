@@ -10,13 +10,12 @@ this file current, ticking items off and pruning them once they have shipped.
       forces a re-consent, so handle the "token has fewer scopes than we now
       need" case rather than silently failing. Open question: its own column, or
       folded into the mail column as a day strip.
-- [ ] **Toggle for a vertical bar HUD.** Let the whole window stand on its end
-      against a screen edge — the bar running down the side, columns stacked
-      rather than side by side. Mostly a matter of flipping `#wrap`'s axis and
-      giving the collapsed state a width rather than a height, but the drag
-      region, the memory rail and the peek geometry all assume horizontal today.
 
 ## Known gaps
+
+- [ ] **Vertical layout hides the message previews.** There is no room for them
+      in a 44px strip, so the collapsed vertical bar shows counts only. A
+      rotated one-line preview might fit if the strip is made thicker.
 
 - [ ] **Never exercised against live Gmail or Slack.** Everything so far is
       window behaviour and layout against fake data. The API paths — token

@@ -39,7 +39,7 @@ paint.hudHeight = bindRange('hudHeight', 'hudHeight', (v) => `${v} px`);
 paint.hudOpacity = bindRange('hudOpacity', 'hudOpacity', (v) => `${v}%`, (v) => v / 100);
 
 for (const key of ['showGmail', 'showSlack', 'showMemory', 'showMemoryColumn',
-                   'launchAtLogin', 'slackOpenInBrowser', 'pinned', 'expanded', 'hoverPeek', 'showInTaskbar']) {
+                   'launchAtLogin', 'slackOpenInBrowser', 'pinned', 'expanded', 'hoverPeek', 'showInTaskbar', 'vertical']) {
   bindCheckbox(key, key);
 }
 
@@ -176,7 +176,7 @@ async function refresh() {
   for (const fn of Object.values(paint)) fn();
 
   for (const key of ['showGmail', 'showSlack', 'showMemory', 'showMemoryColumn',
-                     'launchAtLogin', 'slackOpenInBrowser', 'pinned', 'expanded', 'hoverPeek', 'showInTaskbar']) {
+                     'launchAtLogin', 'slackOpenInBrowser', 'pinned', 'expanded', 'hoverPeek', 'showInTaskbar', 'vertical']) {
     $(key).checked = !!cfg[key];
   }
 

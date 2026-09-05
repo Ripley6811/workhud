@@ -109,8 +109,10 @@ function paintMemory(m) {
   $('mem-pct').textContent = m.total ? pct(freeFrac) : '--';
   $('mem-detail').textContent = m.total ? `${bytes(free)} of ${bytes(m.total)}` : 'memory';
   const fill = $('mem-fill');
-  // The rail meter fills upward with what is left, so it drains as memory fills.
-  fill.style.height = `${Math.min(100, freeFrac * 100)}%`;
+  // The meter fills with what is left, so it drains as memory fills. Which axis
+  // it grows along depends on the layout, so CSS reads this rather than a
+  // hard-coded height.
+  fill.style.setProperty('--share', `${Math.min(100, freeFrac * 100)}%`);
   fill.style.background = freeColour(freeFrac);
   // The rail is the whole memory UI now, so the detail lives in its tooltip.
   const lines = [];
@@ -334,13 +336,17 @@ function paintDash() {
 function applyMode() {
   const on = !!(cfg.expanded || peeking);
   document.body.classList.toggle('expanded', on);
+  document.body.classList.toggle('vertical', !!cfg.vertical);
   show($('dash'), on);
   show($('col-gmail'), cfg.showGmail);
   show($('col-slack'), cfg.showSlack);
   show($('col-memory'), on && cfg.showMemory && cfg.showMemoryColumn);
 
   const btn = $('btn-expand');
-  btn.textContent = cfg.expanded ? '▲' : '▼';
+  // The chevron points the way the window will grow.
+  btn.textContent = cfg.vertical
+    ? (cfg.expanded ? '◀' : '▶')
+    : (cfg.expanded ? '▲' : '▼');
   btn.title = cfg.expanded ? 'Collapse to the bar'
     : peeking ? 'Keep it open'
     : 'Expand';

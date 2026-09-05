@@ -65,6 +65,7 @@ const FAKE_CONFIG = {
   showMemoryColumn: true,
   expanded: !location.hash.includes('compact'),
   pinned: true,
+  vertical: location.hash.includes('vertical'),
   hoverPeek: true,
   pollMinutes: 3,
   activePollSeconds: 60,
