@@ -13,9 +13,6 @@ this file current, ticking items off and pruning them once they have shipped.
 
 ## Known gaps
 
-- [ ] **Vertical layout hides the message previews.** There is no room for them
-      in a 44px strip, so the collapsed vertical bar shows counts only. A
-      rotated one-line preview might fit if the strip is made thicker.
 
 - [ ] **Never exercised against live Gmail or Slack.** Everything so far is
       window behaviour and layout against fake data. The API paths — token

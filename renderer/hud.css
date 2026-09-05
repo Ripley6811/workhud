@@ -317,12 +317,18 @@ body.expanded .preview { display: none; }
 /* ==================================================================== */
 
 body.vertical #wrap { flex-direction: column; }
-body.vertical #main { flex-direction: row; min-height: 0; }
+body.vertical #main { flex-direction: row; min-height: 0; overflow: hidden; }
 
 body.vertical #bar {
   flex: 0 0 var(--bar-h);
   width: var(--bar-h);
-  height: auto;
+  /* Not `auto`: a stretched flex item still reports its content as its
+     hypothetical cross size, so an un-wrapped preview would stretch the bar to
+     the full length of the text - thousands of pixels - and drag the rest of
+     the layout with it. Resolving against the container instead pins it. */
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
   flex-direction: column;
   padding: 6px 0;
   border-bottom: 0;
@@ -331,20 +337,28 @@ body.vertical.expanded #bar { border-bottom: 0; border-right: 1px solid var(--li
 
 body.vertical #grip { padding: 2px 0 8px; align-self: center; }
 
-/* Sized to their content and packed at the top, rather than each claiming half
-   the strip and floating in the middle of it. */
+/* Each segment takes half the strip, so its preview has the whole remaining
+   length of the window to run along. */
 body.vertical .seg {
-  flex: 0 0 auto;
+  flex: 1 1 0;
+  min-height: 0;
   flex-direction: column;
+  align-items: center;
   justify-content: flex-start;
   margin: 0 5px;
   padding: 10px 0;
   gap: 8px;
 }
-/* Upright digits, bottom-to-top labels: the same trick the rail uses. */
-body.vertical .seg .label { writing-mode: vertical-rl; transform: rotate(180deg); }
-/* There is no room for a message preview in a strip this narrow. */
-body.vertical .preview { display: none; }
+/* Upright digits, bottom-to-top text: the same trick the rail uses. The strip
+   is narrow but the window is tall, and rotated text runs along the height. */
+body.vertical .seg .label,
+body.vertical .preview { writing-mode: vertical-rl; transform: rotate(180deg); }
+body.vertical .preview {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+}
 
 body.vertical .divider { flex: 0 0 1px; width: auto; height: 1px; margin: 4px 10px; }
 
