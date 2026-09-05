@@ -1,0 +1,48 @@
+{
+  "name": "workhud",
+  "productName": "WorkHUD",
+  "version": "1.0.0",
+  "description": "Always-on-top desktop HUD for work email, Slack and memory usage",
+  "main": "main.js",
+  "author": "Ripley6811",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "icons": "node tools/make-icons.js",
+    "postinstall": "node tools/make-icons.js",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "preview": "node tools/preview.js"
+  },
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "io.github.ripley6811.workhud",
+    "productName": "WorkHUD",
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "assets/**/*",
+      "renderer/**/*",
+      "!renderer/preview*"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    }
+  }
+}

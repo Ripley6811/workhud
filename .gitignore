@@ -1,0 +1,7 @@
+node_modules/
+dist/
+assets/*.png
+*.log
+
+run.*.log
+renderer/preview.html

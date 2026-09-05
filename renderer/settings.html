@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:;">
+  <title>WorkHUD Settings</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+<main>
+  <h1>WorkHUD</h1>
+  <p class="lede">A floating window for unread mail, new Slack messages and memory pressure. Drag it where you like, collapse it to a single bar, or expand it to watch both feeds side by side. Everything is stored locally.</p>
+
+  <!-- ------------------------------------------------------------ polling -->
+  <section class="card">
+    <h2>Polling</h2>
+    <div class="field">
+      <label for="pollMinutes">Check email and Slack every</label>
+      <div class="row">
+        <input type="range" id="pollMinutes" min="1" max="30" step="1">
+        <output id="pollMinutesOut" class="out"></output>
+      </div>
+      <p class="hint">2-5 minutes is the sweet spot while collapsed. Below 2 you burn API quota for little benefit.</p>
+    </div>
+    <div class="field">
+      <label for="activePollSeconds">While expanded, check every</label>
+      <div class="row">
+        <input type="range" id="activePollSeconds" min="15" max="300" step="5">
+        <output id="activePollSecondsOut" class="out"></output>
+      </div>
+      <p class="hint">The expanded window is one you are actually watching, so it refreshes faster. This is polling, not a live push: nothing appears sooner than the next check. Slack rate-limits at roughly 50 calls a minute and each check costs about one per conversation, so below 30 seconds you risk being throttled.</p>
+    </div>
+    <div class="field">
+      <label for="maxItems">Messages listed per column</label>
+      <input type="number" id="maxItems" min="1" max="100">
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------- google -->
+  <section class="card">
+    <h2>Google <span class="badge" id="googleBadge">Not connected</span></h2>
+    <p class="hint">Gmail read-only access through your own Google account. WorkHUD never sees your password; Google issues a token that is stored encrypted on this machine.</p>
+
+    <details>
+      <summary>First time: create a Google OAuth client (about 3 minutes)</summary>
+      <ol>
+        <li>Open <a href="https://console.cloud.google.com/" data-ext>console.cloud.google.com</a> and create a project (any name).</li>
+        <li><b>APIs &amp; Services &rarr; Library</b>: search for <b>Gmail API</b> and enable it.</li>
+        <li><b>OAuth consent screen</b>: choose <b>Internal</b> if your work account allows it, otherwise <b>External</b> and add your own address under <b>Test users</b>.</li>
+        <li><b>Credentials &rarr; Create credentials &rarr; OAuth client ID</b>. Application type must be <b>Desktop app</b>.</li>
+        <li>Copy the client ID and client secret into the two boxes below.</li>
+      </ol>
+      <p class="hint">A "Desktop app" client is what makes the loopback sign-in work. A "Web application" client will be rejected by Google.</p>
+    </details>
+
+    <div class="field">
+      <label for="googleClientId">Client ID</label>
+      <input type="text" id="googleClientId" spellcheck="false" placeholder="1234-abcd.apps.googleusercontent.com">
+    </div>
+    <div class="field">
+      <label for="googleClientSecret">Client secret</label>
+      <input type="password" id="googleClientSecret" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="gmailQuery">Gmail search used for the badge</label>
+      <input type="text" id="gmailQuery" spellcheck="false">
+      <p class="hint">Standard Gmail search syntax, e.g. <code>is:unread in:inbox -category:promotions</code>.</p>
+    </div>
+    <div class="actions">
+      <button id="googleConnect" class="primary">Sign in with Google</button>
+      <button id="googleDisconnect" class="ghost">Disconnect</button>
+      <span class="status" id="googleStatus"></span>
+    </div>
+  </section>
+
+  <!-- -------------------------------------------------------------- slack -->
+  <section class="card">
+    <h2>Slack <span class="badge" id="slackBadge">Not connected</span></h2>
+    <p class="note">Slack does not accept Google as a login for API access. You sign in to Slack in your browser (where your Google SSO applies), Slack issues its own token, and you paste it here once.</p>
+
+    <details>
+      <summary>First time: create a Slack app and copy the user token</summary>
+      <ol>
+        <li>Open <a href="https://api.slack.com/apps" data-ext>api.slack.com/apps</a> &rarr; <b>Create New App</b> &rarr; <b>From scratch</b>, and pick your work workspace.</li>
+        <li>Go to <b>OAuth &amp; Permissions</b> and add these under <b>User Token Scopes</b> (not Bot Token Scopes):
+          <p class="scopes"><code>channels:history</code> <code>groups:history</code> <code>im:history</code> <code>mpim:history</code> <code>channels:read</code> <code>groups:read</code> <code>im:read</code> <code>mpim:read</code> <code>users:read</code> <code>search:read</code></p>
+        </li>
+        <li>Click <b>Install to Workspace</b> and approve. This is the step where you authenticate with Google.</li>
+        <li>Copy the <b>User OAuth Token</b> &mdash; it starts with <code>xoxp-</code>, not <code>xoxb-</code>.</li>
+        <li>Paste it below and press Connect.</li>
+      </ol>
+      <p class="hint">If your workspace requires admin approval for apps, that request goes to your Slack admin at step 3. <code>search:read</code> is only used for channel mentions and is skipped automatically if your plan does not include search.</p>
+    </details>
+
+    <div class="field">
+      <label for="slackToken">User OAuth token</label>
+      <input type="password" id="slackToken" spellcheck="false" placeholder="xoxp-...">
+    </div>
+    <div class="field checkbox">
+      <input type="checkbox" id="slackOpenInBrowser">
+      <label for="slackOpenInBrowser">Open Slack messages in the browser instead of the desktop app</label>
+    </div>
+    <div class="actions">
+      <button id="slackConnect" class="primary">Connect</button>
+      <button id="slackDisconnect" class="ghost">Disconnect</button>
+      <span class="status" id="slackStatus"></span>
+    </div>
+  </section>
+
+  <!-- --------------------------------------------------------- appearance -->
+  <section class="card">
+    <h2>Window</h2>
+    <div class="field checkbox"><input type="checkbox" id="pinned"><label for="pinned">Keep on top of other windows (the pin icon in the bar toggles this too)</label></div>
+    <div class="field checkbox"><input type="checkbox" id="expanded"><label for="expanded">Expanded &mdash; mail and Slack side by side</label></div>
+    <div class="field checkbox"><input type="checkbox" id="hoverPeek"><label for="hoverPeek">While collapsed, hovering the top bar previews the dashboard</label></div>
+
+    <div class="field checkbox"><input type="checkbox" id="showGmail"><label for="showGmail">Show email</label></div>
+    <div class="field checkbox"><input type="checkbox" id="showSlack"><label for="showSlack">Show Slack</label></div>
+    <div class="field checkbox"><input type="checkbox" id="showMemory"><label for="showMemory">Show the memory rail on the right edge</label></div>
+    <div class="field checkbox"><input type="checkbox" id="showMemoryColumn"><label for="showMemoryColumn">Show the memory detail panel (clicking the rail toggles this)</label></div>
+
+    <div class="field">
+      <label>Drives listed in that panel</label>
+      <div id="diskList" class="disk-list"></div>
+      <p class="hint">The panel shows system memory, then disk space per drive, then the heaviest processes. With every drive ticked, any new one you plug in appears automatically.</p>
+    </div>
+
+    <div class="field">
+      <label for="hudHeight">Bar height</label>
+      <div class="row"><input type="range" id="hudHeight" min="28" max="80" step="1"><output id="hudHeightOut" class="out"></output></div>
+    </div>
+    <div class="field">
+      <label for="hudOpacity">Opacity</label>
+      <div class="row"><input type="range" id="hudOpacity" min="30" max="100" step="1"><output id="hudOpacityOut" class="out"></output></div>
+    </div>
+    <p class="hint">The preview closes as soon as the pointer leaves the bar, so click the chevron or the memory rail to keep it open. Drag the window by its bar or by a column heading. Resize from any edge while expanded; the position and size are remembered.</p>
+    <div class="actions">
+      <button id="resetPosition" class="ghost">Reset window position</button>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ general -->
+  <section class="card">
+    <h2>General</h2>
+    <div class="field checkbox"><input type="checkbox" id="launchAtLogin"><label for="launchAtLogin">Start WorkHUD when I log in</label></div>
+    <p class="hint">Settings file: <code id="configPath"></code></p>
+    <p class="hint" id="encryptionNote"></p>
+    <div class="actions">
+      <button id="refreshNow" class="ghost">Refresh now</button>
+      <button id="quitApp" class="ghost danger">Quit WorkHUD</button>
+    </div>
+  </section>
+</main>
+<script src="settings.js"></script>
+</body>
+</html>

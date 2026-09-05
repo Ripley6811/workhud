@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:;">
+  <title>WorkHUD</title>
+  <link rel="stylesheet" href="hud.css">
+</head>
+<body>
+  <div id="wrap">
+    <div id="main">
+
+      <nav id="bar">
+        <span id="grip" title="Drag to move">&#8942;&#8942;</span>
+
+        <div class="seg" id="seg-gmail" title="Drag here to move the window">
+          <span class="ico" aria-hidden="true">&#9993;</span>
+          <span class="count" id="gmail-count">--</span>
+          <span class="label">Inbox</span>
+          <span class="dot" id="gmail-dot"></span>
+          <span class="preview" id="gmail-preview"></span>
+        </div>
+
+        <span class="divider"></span>
+
+        <div class="seg" id="seg-slack" title="Drag here to move the window">
+          <span class="ico" aria-hidden="true">&#35;</span>
+          <span class="count" id="slack-count">--</span>
+          <span class="label">Slack</span>
+          <span class="dot" id="slack-dot"></span>
+          <span class="preview" id="slack-preview"></span>
+        </div>
+
+        <span id="status" class="status"></span>
+        <span id="tools">
+          <button class="icon-btn" id="btn-refresh" title="Refresh now">&#8635;</button>
+          <button class="icon-btn" id="btn-pin" title="Keep on top of other windows">
+            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+              <g transform="rotate(45 12 12)">
+                <path fill="currentColor" d="M8.4 2.6h7.2a1 1 0 0 1 .6 1.8l-.9.7v4.3l2.1 2.2a1.4 1.4 0 0 1-1 2.4H7.6a1.4 1.4 0 0 1-1-2.4l2.1-2.2V5.1l-.9-.7a1 1 0 0 1 .6-1.8Z"></path>
+                <path d="M12 14v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+              </g>
+            </svg>
+          </button>
+          <button class="icon-btn" id="btn-settings" title="Settings">&#9881;</button>
+          <button class="icon-btn" id="btn-expand" title="Expand">&#9660;</button>
+        </span>
+      </nav>
+
+      <!-- Expanded mode: mail and Slack side by side, both updating at once. -->
+      <section id="dash" hidden>
+        <section class="col" id="col-gmail">
+          <header class="col-head">
+            <h2>Inbox</h2>
+            <span class="col-count" id="gmail-col-count" hidden></span>
+            <div class="grow"></div>
+            <span class="col-meta" id="gmail-meta"></span>
+          </header>
+          <div class="col-body" id="gmail-body"></div>
+        </section>
+
+        <section class="col" id="col-slack">
+          <header class="col-head">
+            <h2>Slack</h2>
+            <span class="col-count" id="slack-col-count" hidden></span>
+            <div class="grow"></div>
+            <button class="ghost" id="slack-mark" hidden>Mark all seen</button>
+            <span class="col-meta" id="slack-meta"></span>
+          </header>
+          <div class="col-body" id="slack-body"></div>
+        </section>
+
+
+        <section class="col narrow" id="col-memory" hidden>
+          <header class="col-head">
+            <h2>Memory</h2>
+            <div class="grow"></div>
+            <span class="col-meta" id="memory-meta"></span>
+          </header>
+          <div class="col-body" id="memory-body"></div>
+        </section>
+      </section>
+    </div>
+
+    <!-- Memory is a readout, not a panel: a rail keeps the width for mail and Slack. -->
+    <button id="rail" title="Memory - click for detail">
+      <span id="rail-meter"><i id="mem-fill"></i></span>
+      <span id="rail-text">
+        <b id="mem-pct">--</b>
+        <span id="mem-detail"></span>
+      </span>
+    </button>
+  </div>
+  <script src="hud.js"></script>
+</body>
+</html>
