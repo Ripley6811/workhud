@@ -99,5 +99,6 @@ fs.writeFileSync(path.join(OUT, 'trayTemplate@2x.png'), render(32, [0, 0, 0]));
 // Windows/Linux trays do not recolour, so use an accent that reads on light and dark.
 fs.writeFileSync(path.join(OUT, 'tray.png'), render(16, [77, 163, 255]));
 fs.writeFileSync(path.join(OUT, 'tray@2x.png'), render(32, [77, 163, 255]));
-fs.writeFileSync(path.join(OUT, 'icon.png'), render(256, [77, 163, 255]));
+// electron-builder wants 512px or larger to derive .ico and .icns from.
+fs.writeFileSync(path.join(OUT, 'icon.png'), render(512, [77, 163, 255]));
 console.log('[icons] wrote tray icons to assets/');

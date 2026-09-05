@@ -218,24 +218,39 @@ function paintSlackColumn() {
   return undefined;
 }
 
+// A labelled fuel gauge: name and free share on top, bar, then `free of total`.
+// RAM and each disk are the same kind of reading, so they get the same row.
+function gaugeRow(name) {
+  const row = el('div', 'disk');
+  const top = el('div', 'top');
+  top.appendChild(el('span', 'who', name));
+  const share = el('span', 'pct', '--');
+  top.appendChild(share);
+  row.appendChild(top);
+  const bar = el('span', 'bar');
+  const fill = el('i');
+  bar.appendChild(fill);
+  row.appendChild(bar);
+  const sub = el('div', 'sub', '');
+  row.appendChild(sub);
+  return { row, fill, share, sub };
+}
+
+// The row's own label says what it is, so it needs no section heading above it.
+function paintGauge(g, free, total) {
+  const frac = total ? free / total : 0;
+  g.fill.style.width = `${Math.round(frac * 100)}%`;
+  g.fill.style.background = freeColour(frac);
+  g.share.textContent = `${pct(frac)} free`;
+  g.share.style.color = freeColour(frac);
+  g.sub.textContent = `${bytes(free)} of ${bytes(total)}`;
+  return frac;
+}
+
 function buildMemoryDom(body) {
   body.replaceChildren();
-  // Every block gets a heading. Without one over the RAM figures they read as
-  // belonging to whatever the reader assumes the panel is about - which, in a
-  // panel that also lists disks, is a coin toss.
-  body.appendChild(el('div', 'section', 'RAM'));
-  const grid = el('div', 'stat-grid');
-  const values = {};
-  // Free and total are the two numbers worth reading at a glance; used is just
-  // the difference and only adds noise in a column this narrow.
-  for (const k of ['Total', 'Free']) {
-    const box = el('div', 'stat');
-    box.appendChild(el('span', 'k', k));
-    values[k] = el('span', 'v', '--');
-    box.appendChild(values[k]);
-    grid.appendChild(box);
-  }
-  body.appendChild(grid);
+  const ram = gaugeRow('RAM');
+  body.appendChild(ram.row);
 
   const diskHead = el('div', 'section', 'Disks');
   const disks = el('div');
@@ -247,7 +262,7 @@ function buildMemoryDom(body) {
   body.appendChild(procHead);
   body.appendChild(procs);
 
-  return { values, disks, diskHead, procs, procHead, diskKey: null, diskRows: [], procKey: null, procRows: [] };
+  return { ram, disks, diskHead, procs, procHead, diskKey: null, diskRows: [], procKey: null, procRows: [] };
 }
 
 function paintMemoryColumn() {
@@ -255,11 +270,11 @@ function paintMemoryColumn() {
   const body = $('memory-body');
   if (!memoryDom || !body.contains(memoryDom.procs)) memoryDom = buildMemoryDom(body);
 
+
   const ramFree = (m.total || 0) - (m.used || 0);
-  const ramFreeFrac = m.total ? ramFree / m.total : 0;
-  $('memory-meta').textContent = m.total ? `${pct(ramFreeFrac)} free` : '';
-  memoryDom.values.Total.textContent = bytes(m.total);
-  memoryDom.values.Free.textContent = bytes(ramFree);
+  const ramFrac = paintGauge(memoryDom.ram, ramFree, m.total || 0);
+  memoryDom.ram.row.title = `RAM - ${bytes(ramFree)} free of ${bytes(m.total)} (${pct(ramFrac)} free)`;
+  $('memory-meta').textContent = '';
 
   const wanted = new Set(cfg.diskFilter || []);
   const disks = (m.disks || []).filter((d) => !wanted.size || wanted.has(d.name));
@@ -274,32 +289,16 @@ function paintMemoryColumn() {
     memoryDom.diskRows = [];
     memoryDom.disks.replaceChildren();
     for (const d of disks) {
-      const row = el('div', 'disk');
-      const top = el('div', 'top');
-      top.appendChild(el('span', 'who', d.name));
-      const share = el('span', 'pct', '--');
-      top.appendChild(share);
-      row.appendChild(top);
-      const bar = el('span', 'bar');
-      const fill = el('i');
-      bar.appendChild(fill);
-      row.appendChild(bar);
-      const sub = el('div', 'sub', '');
-      row.appendChild(sub);
-      memoryDom.disks.appendChild(row);
-      memoryDom.diskRows.push({ row, fill, share, sub });
+      const g = gaugeRow(d.name);
+      memoryDom.disks.appendChild(g.row);
+      memoryDom.diskRows.push(g);
     }
   }
   disks.forEach((d, i) => {
-    const r = memoryDom.diskRows[i];
-    if (!r) return;
-    const freeFrac = d.total ? d.free / d.total : 0;
-    r.fill.style.width = `${Math.round(freeFrac * 100)}%`;
-    r.fill.style.background = freeColour(freeFrac);
-    r.share.textContent = `${pct(freeFrac)} free`;
-    r.share.style.color = freeColour(freeFrac);
-    r.sub.textContent = `${bytes(d.free)} of ${bytes(d.total)}`;
-    r.row.title = `${d.name} - ${bytes(d.free)} free of ${bytes(d.total)} (${pct(freeFrac)} free)`;
+    const g = memoryDom.diskRows[i];
+    if (!g) return;
+    const frac = paintGauge(g, d.free, d.total);
+    g.row.title = `${d.name} - ${bytes(d.free)} free of ${bytes(d.total)} (${pct(frac)} free)`;
   });
 
   const procs = m.processes || [];

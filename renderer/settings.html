@@ -111,6 +111,7 @@
   <section class="card">
     <h2>Window</h2>
     <div class="field checkbox"><input type="checkbox" id="pinned"><label for="pinned">Keep on top of other windows (the pin icon in the bar toggles this too)</label></div>
+    <div class="field checkbox"><input type="checkbox" id="showInTaskbar"><label for="showInTaskbar">Show in the taskbar (the Dock, on macOS)</label></div>
     <div class="field checkbox"><input type="checkbox" id="expanded"><label for="expanded">Expanded &mdash; mail and Slack side by side</label></div>
     <div class="field checkbox"><input type="checkbox" id="hoverPeek"><label for="hoverPeek">While collapsed, hovering the top bar previews the dashboard</label></div>
 
@@ -133,7 +134,7 @@
       <label for="hudOpacity">Opacity</label>
       <div class="row"><input type="range" id="hudOpacity" min="30" max="100" step="1"><output id="hudOpacityOut" class="out"></output></div>
     </div>
-    <p class="hint">The preview closes as soon as the pointer leaves the bar, so click the chevron or the memory rail to keep it open. Drag the window by its bar or by a column heading. Resize from any edge while expanded; the position and size are remembered.</p>
+    <p class="hint">WorkHUD also sits in the system tray, next to the clock &mdash; possibly behind the overflow arrow. Right-click it for the same controls. <br>The preview closes as soon as the pointer leaves the bar, so click the chevron or the memory rail to keep it open. Drag the window by its bar or by a column heading. Resize from any edge while expanded; the position and size are remembered.</p>
     <div class="actions">
       <button id="resetPosition" class="ghost">Reset window position</button>
     </div>

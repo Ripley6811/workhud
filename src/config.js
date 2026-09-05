@@ -28,6 +28,7 @@ const DEFAULTS = {
   expanded: false,
   hoverPeek: true,          // collapsed, hovering the bar peeks the dashboard open
   pinned: true,
+  showInTaskbar: true,      // taskbar button on Windows, Dock icon on macOS
   bounds: null,             // {x,y,width,height} of the expanded window; null = pick a default
   launchAtLogin: false,
   google: { clientId: '', clientSecret: '', tokens: null, email: '' },

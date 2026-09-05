@@ -90,6 +90,11 @@ function applyWindowMode() {
     console.log('[mode] want', b.width + 'x' + height, 'open', open,
       'got', JSON.stringify(hud.getBounds()));
   }
+  hud.setSkipTaskbar(!cfg.showInTaskbar);
+  // macOS has no taskbar; the Dock icon is the equivalent presence.
+  if (isMac && app.dock) {
+    if (cfg.showInTaskbar) app.dock.show(); else app.dock.hide();
+  }
   hud.setAlwaysOnTop(!!cfg.pinned, 'floating');
   if (cfg.pinned) hud.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   else hud.setVisibleOnAllWorkspaces(false);
@@ -171,10 +176,13 @@ function createHud() {
     backgroundColor: '#111319',
     resizable: cfg.expanded,
     movable: true,
-    minimizable: false,
+    // Minimizable so the taskbar button behaves like every other app's when
+    // the window is shown there.
+    minimizable: true,
     maximizable: false,
     fullscreenable: false,
-    skipTaskbar: true,
+    skipTaskbar: !cfg.showInTaskbar,
+    icon: path.join(__dirname, 'assets', 'icon.png'),
     show: false,
     ...(isMac ? { type: 'panel' } : {}),
     webPreferences: {
@@ -200,6 +208,7 @@ function createSettings() {
     minWidth: 600,
     minHeight: 520,
     title: 'WorkHUD Settings',
+    icon: path.join(__dirname, 'assets', 'icon.png'),
     show: false,
     backgroundColor: '#12141a',
     autoHideMenuBar: true,
@@ -413,7 +422,9 @@ if (!app.requestSingleInstanceLock()) {
   app.on('second-instance', () => { if (hud) { hud.show(); hud.focus(); } });
 
   app.whenReady().then(() => {
-    if (isMac && app.dock) app.dock.hide(); // a HUD does not belong in the Dock
+    // The Dock icon follows the same setting as the Windows taskbar button;
+    // applyWindowMode sets it once the window exists.
+    if (isMac && app.dock && !config.load().showInTaskbar) app.dock.hide();
     registerIpc();
     createHud();
     buildTray();
