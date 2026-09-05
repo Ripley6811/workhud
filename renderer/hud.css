@@ -317,16 +317,22 @@ body.expanded .preview { display: none; }
 /* ==================================================================== */
 
 body.vertical #wrap { flex-direction: column; }
-body.vertical #main { flex-direction: row; min-height: 0; overflow: hidden; }
+/* flex-basis:0, not the inherited auto: an auto basis would size #main from
+   its own content before the flex algorithm runs, which pulls in #bar's huge
+   content-based height (from the unwrapped rotated preview text below) and
+   inflates #main, then #wrap, then the whole document. Basis 0 sidesteps that
+   entirely - #main is simply "whatever #wrap has left after the rail". */
+body.vertical #main { flex: 1 1 0; flex-direction: row; min-height: 0; overflow: hidden; }
 
 body.vertical #bar {
   flex: 0 0 var(--bar-h);
   width: var(--bar-h);
-  /* Not `auto`: a stretched flex item still reports its content as its
-     hypothetical cross size, so an un-wrapped preview would stretch the bar to
-     the full length of the text - thousands of pixels - and drag the rest of
-     the layout with it. Resolving against the container instead pins it. */
-  height: 100%;
+  /* The base rule sets a fixed `height: var(--bar-h)` for the horizontal
+     layout's thickness. CSS cascades per property, not per rule, so without
+     this override that fixed height keeps winning here too - #main's default
+     align-items:stretch never gets a chance to fill #bar to the window's
+     length, and #bar renders as a 44x44 square instead of a tall strip. */
+  height: auto;
   min-height: 0;
   overflow: hidden;
   flex-direction: column;
