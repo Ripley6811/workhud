@@ -84,6 +84,22 @@ function paintBar() {
   $('seg-gmail').title = g.needsSetup ? 'Not connected - open Settings' : g.error || `Inbox: ${g.account || ''}`;
   setPreview('gmail-preview', (g.items || [])[0], (it) => it.subject);
 
+  const c = state.calendar || {};
+  show($('seg-calendar'), cfg.showCalendar);
+  const upcoming = c.upcoming || [];
+  const next = upcoming[0] || null;
+  const parts = countdownParts(c, next);
+  const calCount = $('cal-bar-count');
+  calCount.className = 'count';
+  if (parts.now) calCount.classList.add('alert');
+  calCount.textContent = parts.count;
+  $('cal-bar-unit').textContent = parts.unit;
+  $('cal-bar-dot').className = `dot${c.needsSetup || c.needsReconsent ? ' setup' : c.error ? ' err' : ''}`;
+  $('seg-calendar').title = c.needsSetup ? 'Not connected - open Settings'
+    : c.needsReconsent ? 'Sign in with Google again to grant Calendar access'
+    : c.error || (next ? next.title : 'No upcoming events');
+  $('cal-bar-preview').textContent = next ? next.title : '';
+
   const s = state.slack || {};
   show($('seg-slack'), cfg.showSlack);
   $('slack-count').textContent = s.ok ? String(s.count) : '--';
@@ -348,44 +364,34 @@ function paintEventPanel(idx, ev, on) {
   $(`cal-ev-${idx}-when`).textContent = fmtWhen(ev);
 }
 
+// Shared by the compact bar segment and the dashboard column's big countdown,
+// so the two can never disagree about how long until the next meeting.
+function countdownParts(c, next) {
+  if (c.needsSetup || c.needsReconsent) return { count: '--', unit: c.needsReconsent ? 'reconnect' : 'not connected' };
+  if (c.error) return { count: '--', unit: 'error' };
+  if (!next) return { count: '--', unit: 'no events' };
+
+  const now = Date.now();
+  if (now >= next.startMs && now < next.endMs) return { count: 'NOW', unit: 'in progress', now: true };
+
+  const mins = Math.max(0, Math.round((next.startMs - now) / 60000));
+  if (mins < 60) return { count: String(mins), unit: mins === 1 ? 'minute' : 'minutes', soon: mins <= 5 };
+  if (mins < 60 * 24) return { count: String(Math.round(mins / 60)), unit: 'hours' };
+  return { count: String(Math.round(mins / 60 / 24)), unit: 'days' };
+}
+
 function paintCalendarColumn() {
   const c = state.calendar || {};
   const upcoming = c.upcoming || [];
   const next = upcoming[0] || null;
+  const parts = countdownParts(c, next);
   const countEl = $('cal-count');
   const unitEl = $('cal-unit');
   countEl.className = 'cal-count';
-
-  if (c.needsSetup || c.needsReconsent) {
-    countEl.textContent = '--';
-    unitEl.textContent = c.needsReconsent ? 'reconnect' : 'not connected';
-  } else if (c.error) {
-    countEl.textContent = '--';
-    unitEl.textContent = 'error';
-  } else if (!next) {
-    countEl.textContent = '--';
-    unitEl.textContent = 'no events';
-  } else {
-    const now = Date.now();
-    if (now >= next.startMs && now < next.endMs) {
-      countEl.textContent = 'NOW';
-      countEl.classList.add('now');
-      unitEl.textContent = 'in progress';
-    } else {
-      const mins = Math.max(0, Math.round((next.startMs - now) / 60000));
-      if (mins < 60) {
-        countEl.textContent = String(mins);
-        unitEl.textContent = mins === 1 ? 'minute' : 'minutes';
-        if (mins <= 5) countEl.classList.add('soon');
-      } else if (mins < 60 * 24) {
-        countEl.textContent = String(Math.round(mins / 60));
-        unitEl.textContent = 'hours';
-      } else {
-        countEl.textContent = String(Math.round(mins / 60 / 24));
-        unitEl.textContent = 'days';
-      }
-    }
-  }
+  if (parts.now) countEl.classList.add('now');
+  if (parts.soon) countEl.classList.add('soon');
+  countEl.textContent = parts.count;
+  unitEl.textContent = parts.unit;
 
   const panelCount = cfg.calendarPanelCount || 2;
   for (let i = 0; i < 4; i++) paintEventPanel(i, upcoming[i] || null, i < panelCount);

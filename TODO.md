@@ -21,10 +21,6 @@ this file current, ticking items off and pruning them once they have shipped.
       (`calendar.readonly` scope, event parsing, the insufficient-scope
       re-consent path for accounts that connected before this existed) is
       unverified - same caveat as Gmail and Slack below.
-- [ ] **Calendar has no bar segment or vertical-mode polish.** It only shows in
-      the expanded dashboard, between mail and Slack, as specified. Collapsed
-      bar and the vertical layout show/hide it correctly but haven't had the
-      same layout attention as Gmail/Slack there.
 - [ ] **1-4 meeting panels is now user-set** (Settings, default 2) but only
       verified in the preview harness at 2 and 4. 1 and 3 weren't screenshotted
       - should be fine (same code path, just a loop bound) but not eyeballed.

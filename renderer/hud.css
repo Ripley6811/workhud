@@ -259,6 +259,12 @@ body.expanded .preview { display: none; }
 
 /* A narrow column of three equal panels, not a header+list like the other
    columns - this is a glance, not a feed. */
+/* [hidden] and .col.cal tie at specificity (0,2,0), so whichever comes later
+   in the file would otherwise win regardless of which one should apply - the
+   same trap #panel/#dash/.cal-panel hit already. One extra selector part
+   settles it for good, rather than depending on staying below .col.cal in
+   source order. */
+.col.cal[hidden] { display: none; }
 .col.cal {
   flex: 0 0 12.5rem;
   display: flex;
