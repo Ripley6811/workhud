@@ -6,7 +6,11 @@ const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const USERINFO_URL = 'https://openidconnect.googleapis.com/v1/userinfo';
 const GMAIL = 'https://gmail.googleapis.com/gmail/v1/users/me';
-const SCOPES = ['openid', 'email', 'https://www.googleapis.com/auth/gmail.readonly'].join(' ');
+const SCOPES = [
+  'openid', 'email',
+  'https://www.googleapis.com/auth/gmail.readonly',
+  'https://www.googleapis.com/auth/calendar.readonly',
+].join(' ');
 
 async function postForm(url, params) {
   const res = await fetch(url, {
@@ -158,4 +162,5 @@ async function fetch_() {
   return { ok: true, count, items, account: cfg.google.email };
 }
 
-module.exports = { signIn, signOut, fetch: fetch_ };
+// Calendar shares this account and its refresh logic - no separate sign-in.
+module.exports = { signIn, signOut, fetch: fetch_, accessToken };

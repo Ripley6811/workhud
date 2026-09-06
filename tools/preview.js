@@ -5,10 +5,18 @@ const path = require('path');
 
 const dir = path.join(__dirname, '..', 'renderer');
 const src = fs.readFileSync(path.join(dir, 'hud.html'), 'utf8');
+
+// Every regeneration gets its own cache-busting query on every local asset.
+// A plain `<script src>`/`<link href>` was silently served stale by the
+// browser across regenerations more than once - the page itself reloading
+// with a new URL query doesn't make the browser re-fetch its script/style
+// sub-resources, only navigations do that reliably.
+const bust = Date.now();
 const out = src
   .replace('<title>WorkHUD</title>', '<title>WorkHUD preview</title>')
+  .replace('href="hud.css"', `href="hud.css?b=${bust}"`)
   .replace('<script src="hud.js"></script>',
-           '<script src="preview-stub.js"></script>\n  <script src="hud.js"></script>');
+           `<script src="preview-stub.js?b=${bust}"></script>\n  <script src="hud.js?b=${bust}"></script>`);
 
 if (out === src) {
   console.error('[preview] could not find the hud.js script tag in hud.html');

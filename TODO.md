@@ -5,13 +5,26 @@ this file current, ticking items off and pruning them once they have shipped.
 
 ## Next
 
-- [ ] **Google Calendar support.** Today's events as a fourth source. The Gmail
-      OAuth client can carry it — add `calendar.readonly` to the scopes, which
-      forces a re-consent, so handle the "token has fewer scopes than we now
-      need" case rather than silently failing. Open question: its own column, or
-      folded into the mail column as a day strip.
+- [ ] **Make "show disk space" optional on the memory panel.** A toggle to hide
+      the DISKS section; with it off, the panel is just RAM plus the process
+      list. Same pattern as `showMemoryColumn` - a config flag, checked in
+      `paintMemoryColumn`.
+- [ ] **Put RAM next to the process list, not next to DISKS.** Currently the
+      panel reads RAM, DISKS, RAM BY PROCESS top to bottom - the two RAM
+      sections aren't adjacent. Reorder to RAM, RAM BY PROCESS, DISKS (or drop
+      DISKS to the very bottom) so the related pair sits together.
 
 ## Known gaps
+
+- [ ] **Calendar never exercised against a live Google account.** Built and
+      verified in the preview harness against fake events. The real API path
+      (`calendar.readonly` scope, event parsing, the insufficient-scope
+      re-consent path for accounts that connected before this existed) is
+      unverified - same caveat as Gmail and Slack below.
+- [ ] **Calendar has no bar segment or vertical-mode polish.** It only shows in
+      the expanded dashboard, between mail and Slack, as specified. Collapsed
+      bar and the vertical layout show/hide it correctly but haven't had the
+      same layout attention as Gmail/Slack there.
 
 
 - [ ] **Never exercised against live Gmail or Slack.** Everything so far is

@@ -255,6 +255,44 @@ body.expanded .preview { display: none; }
 .stat .k { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
 .stat .v { font-size: 16px; font-variant-numeric: tabular-nums; }
 
+/* --------------------------------------------------------------- calendar */
+
+/* A narrow column of three equal panels, not a header+list like the other
+   columns - this is a glance, not a feed. */
+.col.cal {
+  flex: 0 0 12.5rem;
+  display: flex;
+  flex-direction: column;
+}
+.cal-panel {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+  overflow: hidden;
+}
+.cal-panel:last-child { border-bottom: 0; }
+
+.cal-countdown { gap: 0; }
+.cal-count { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+.cal-count.now { color: var(--accent); }
+.cal-count.soon { color: var(--warn); }
+.cal-unit { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
+.cal-label { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.cal-title {
+  font-weight: 600; font-size: 12.5px; max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cal-when { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cal-event.empty .cal-title { color: var(--muted); font-weight: 400; }
+
 /* ------------------------------------------------------------ memory rail */
 
 #rail {
@@ -394,6 +432,10 @@ body.vertical .col:first-child { border-top: 0; }
    the two message lists want everything left over. */
 body.vertical .col.narrow { flex: 0 0 auto; }
 body.vertical .col.narrow .col-body { flex: 0 0 auto; overflow: visible; }
+/* Stacked, the 3 calendar panels keep a fixed, readable height each rather
+   than stretching to fill whatever the column has left. */
+body.vertical .col.cal { flex: 0 0 auto; }
+body.vertical .cal-panel { flex: 0 0 auto; padding: 10px; }
 
 body.vertical #rail {
   flex: 0 0 var(--rail-w);

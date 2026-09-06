@@ -17,6 +17,7 @@ const DEFAULTS = {
   showGmail: true,
   showSlack: true,
   showMemory: true,
+  showCalendar: true,
   showMemoryColumn: false,  // the rail's detail panel, opened by clicking it
   diskFilter: [],           // drives to list; empty means every one found
   gmailQuery: 'is:unread in:inbox',

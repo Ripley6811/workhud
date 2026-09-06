@@ -12,6 +12,11 @@ const min = (n) => now - n * 60000;
 const FAKE_STATE = {
   polling: false,
   lastPoll: min(1),
+  calendar: {
+    ok: true,
+    next: { id: 'e1', title: 'Design review', startMs: now + 18 * 60000, endMs: now + 48 * 60000, allDay: false, location: '', attendeeCount: 4, url: '' },
+    following: { id: 'e2', title: '1:1 with Marcus', startMs: now + 3 * 3600000, endMs: now + 3.5 * 3600000, allDay: false, location: '', attendeeCount: 2, url: '' },
+  },
   gmail: {
     ok: true,
     count: 9,
@@ -62,6 +67,7 @@ const FAKE_CONFIG = {
   showGmail: true,
   showSlack: true,
   showMemory: true,
+  showCalendar: true,
   showMemoryColumn: true,
   expanded: !location.hash.includes('compact'),
   pinned: true,

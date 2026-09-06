@@ -328,10 +328,71 @@ function paintMemoryColumn() {
   });
 }
 
+function fmtTime(ms) {
+  return new Date(ms).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+}
+
+function fmtWhen(ev) {
+  if (!ev) return '';
+  if (ev.allDay) return 'All day';
+  return `${fmtTime(ev.startMs)} - ${fmtTime(ev.endMs)}`;
+}
+
+function paintEventPanel(prefix, ev) {
+  const panel = $(`cal-${prefix}`);
+  const title = $(`cal-${prefix}-title`);
+  const when = $(`cal-${prefix}-when`);
+  panel.classList.toggle('empty', !ev);
+  title.textContent = ev ? ev.title : 'Nothing scheduled';
+  when.textContent = fmtWhen(ev);
+}
+
+function paintCalendarColumn() {
+  const c = state.calendar || {};
+  const countEl = $('cal-count');
+  const unitEl = $('cal-unit');
+  countEl.className = 'cal-count';
+
+  if (c.needsSetup || c.needsReconsent) {
+    countEl.textContent = '--';
+    unitEl.textContent = c.needsReconsent ? 'reconnect' : 'not connected';
+  } else if (c.error) {
+    countEl.textContent = '--';
+    unitEl.textContent = 'error';
+  } else if (!c.next) {
+    countEl.textContent = '--';
+    unitEl.textContent = 'no events';
+  } else {
+    const now = Date.now();
+    if (now >= c.next.startMs && now < c.next.endMs) {
+      countEl.textContent = 'NOW';
+      countEl.classList.add('now');
+      unitEl.textContent = 'in progress';
+    } else {
+      const mins = Math.max(0, Math.round((c.next.startMs - now) / 60000));
+      if (mins < 60) {
+        countEl.textContent = String(mins);
+        unitEl.textContent = mins === 1 ? 'minute' : 'minutes';
+        if (mins <= 5) countEl.classList.add('soon');
+      } else if (mins < 60 * 24) {
+        countEl.textContent = String(Math.round(mins / 60));
+        unitEl.textContent = 'hours';
+      } else {
+        countEl.textContent = String(Math.round(mins / 60 / 24));
+        unitEl.textContent = 'days';
+      }
+    }
+  }
+
+  paintEventPanel('next', c.next);
+  paintEventPanel('following', c.following);
+}
+
 function paintDash() {
   if (!cfg.expanded && !peeking) return;
   paintGmailColumn();
   paintSlackColumn();
+  if (cfg.showCalendar) paintCalendarColumn();
   if (cfg.showMemoryColumn) paintMemoryColumn();
 }
 
@@ -343,6 +404,7 @@ function applyMode() {
   document.body.classList.toggle('vertical', !!cfg.vertical);
   show($('dash'), on);
   show($('col-gmail'), cfg.showGmail);
+  show($('col-calendar'), cfg.showCalendar);
   show($('col-slack'), cfg.showSlack);
   show($('col-memory'), on && cfg.showMemory && cfg.showMemoryColumn);
 

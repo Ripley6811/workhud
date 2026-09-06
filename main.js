@@ -8,6 +8,7 @@ const config = require('./src/config');
 const google = require('./src/sources/google');
 const slack = require('./src/sources/slack');
 const memory = require('./src/sources/memory');
+const calendar = require('./src/sources/calendar');
 
 const isMac = process.platform === 'darwin';
 
@@ -37,6 +38,7 @@ let hoverLogged = null; // WORKHUD_DEBUG only: log edges, not every tick
 const state = {
   gmail: { ok: false, count: 0, items: [], error: null, needsSetup: true },
   slack: { ok: false, count: 0, items: [], error: null, needsSetup: true },
+  calendar: { ok: false, next: null, following: null, error: null, needsSetup: true },
   memory: { ok: false, pct: 0, used: 0, total: 0, history: [] },
   lastPoll: 0,
   polling: false,
@@ -325,6 +327,13 @@ async function poll(reason = 'timer') {
       ? slack.fetch().catch((e) => ({ ok: false, count: 0, items: [], error: e.message }))
       : Promise.resolve({ ok: false, disabled: true, count: 0, items: [] })
     ).then((r) => { state.slack = r; })
+  );
+
+  jobs.push(
+    (cfg.showCalendar
+      ? calendar.fetch().catch((e) => ({ ok: false, next: null, following: null, error: e.message }))
+      : Promise.resolve({ ok: false, disabled: true, next: null, following: null })
+    ).then((r) => { state.calendar = r; })
   );
 
   jobs.push(

@@ -105,6 +105,15 @@ its own last-seen timestamp per conversation. "New" therefore means *since you
 last pressed Mark all seen*, not Slack's own unread badge. On first run it only
 looks back 24 hours rather than dumping history at you.
 
+## Calendar
+
+A narrow column between mail and Slack in the expanded dashboard, three
+stacked panels: a countdown to your next meeting, the meeting itself, then
+the one after that. It shares the Gmail sign-in - no separate connection -
+but needs the `calendar.readonly` scope, which is only present on tokens
+issued after this existed. An older connection will ask you to sign in again
+once; that is the new permission being granted, not a broken connection.
+
 ## Polling, not push
 
 Both sources are polled, so nothing appears sooner than the next check:
