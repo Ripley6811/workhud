@@ -38,7 +38,7 @@ let hoverLogged = null; // WORKHUD_DEBUG only: log edges, not every tick
 const state = {
   gmail: { ok: false, count: 0, items: [], error: null, needsSetup: true },
   slack: { ok: false, count: 0, items: [], error: null, needsSetup: true },
-  calendar: { ok: false, next: null, following: null, error: null, needsSetup: true },
+  calendar: { ok: false, upcoming: [], error: null, needsSetup: true },
   memory: { ok: false, pct: 0, used: 0, total: 0, history: [] },
   lastPoll: 0,
   polling: false,
@@ -331,8 +331,8 @@ async function poll(reason = 'timer') {
 
   jobs.push(
     (cfg.showCalendar
-      ? calendar.fetch().catch((e) => ({ ok: false, next: null, following: null, error: e.message }))
-      : Promise.resolve({ ok: false, disabled: true, next: null, following: null })
+      ? calendar.fetch().catch((e) => ({ ok: false, upcoming: [], error: e.message }))
+      : Promise.resolve({ ok: false, disabled: true, upcoming: [] })
     ).then((r) => { state.calendar = r; })
   );
 

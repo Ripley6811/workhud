@@ -14,8 +14,12 @@ const FAKE_STATE = {
   lastPoll: min(1),
   calendar: {
     ok: true,
-    next: { id: 'e1', title: 'Design review', startMs: now + 18 * 60000, endMs: now + 48 * 60000, allDay: false, location: '', attendeeCount: 4, url: '' },
-    following: { id: 'e2', title: '1:1 with Marcus', startMs: now + 3 * 3600000, endMs: now + 3.5 * 3600000, allDay: false, location: '', attendeeCount: 2, url: '' },
+    upcoming: [
+      { id: 'e1', title: 'Design review', startMs: now + 18 * 60000, endMs: now + 48 * 60000, allDay: false, location: '', attendeeCount: 4, url: '' },
+      { id: 'e2', title: '1:1 with Marcus', startMs: now + 3 * 3600000, endMs: now + 3.5 * 3600000, allDay: false, location: '', attendeeCount: 2, url: '' },
+      { id: 'e3', title: 'Sprint planning', startMs: now + 5 * 3600000, endMs: now + 6 * 3600000, allDay: false, location: '', attendeeCount: 8, url: '' },
+      { id: 'e4', title: 'All-hands', startMs: now + 26 * 3600000, endMs: now + 27 * 3600000, allDay: false, location: '', attendeeCount: 40, url: '' },
+    ],
   },
   gmail: {
     ok: true,
@@ -68,6 +72,7 @@ const FAKE_CONFIG = {
   showSlack: true,
   showMemory: true,
   showCalendar: true,
+  calendarPanelCount: Number((location.hash.match(/cal=(\d)/) || [])[1]) || 2,
   showMemoryColumn: true,
   expanded: !location.hash.includes('compact'),
   pinned: true,

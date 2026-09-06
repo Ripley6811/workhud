@@ -34,13 +34,13 @@ function summarize(ev) {
 
 async function fetch_() {
   const cfg = config.load();
-  if (!cfg.google.tokens) return { ok: false, needsSetup: true, error: 'Not connected', next: null, following: null };
+  if (!cfg.google.tokens) return { ok: false, needsSetup: true, error: 'Not connected', upcoming: [] };
 
   let token;
   try {
     token = await google.accessToken();
   } catch (e) {
-    return { ok: false, needsSetup: true, error: e.message, next: null, following: null };
+    return { ok: false, needsSetup: true, error: e.message, upcoming: [] };
   }
 
   const params = new URLSearchParams({
@@ -60,14 +60,14 @@ async function fetch_() {
       return {
         ok: false, needsReconsent: true,
         error: 'Calendar access needs a fresh sign-in (new permission added).',
-        next: null, following: null,
+        upcoming: [],
       };
     }
-    return { ok: false, error: msg || `HTTP ${res.status}`, next: null, following: null };
+    return { ok: false, error: msg || `HTTP ${res.status}`, upcoming: [] };
   }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    return { ok: false, error: body.error?.message || `HTTP ${res.status}`, next: null, following: null };
+    return { ok: false, error: body.error?.message || `HTTP ${res.status}`, upcoming: [] };
   }
 
   const body = await res.json();
@@ -77,7 +77,9 @@ async function fetch_() {
     .filter((e) => Number.isFinite(e.startMs))
     .sort((a, b) => a.startMs - b.startMs);
 
-  return { ok: true, next: events[0] || null, following: events[1] || null };
+  // The UI shows up to 4 panels; fetch a couple extra so back-to-back or
+  // just-ended events don't leave a panel empty when one gets filtered out.
+  return { ok: true, upcoming: events.slice(0, 6) };
 }
 
 module.exports = { fetch: fetch_ };

@@ -62,20 +62,32 @@
         <!-- Three stacked panels, not the usual header+list: a countdown, the
              next meeting, and the one after that. Sits between mail and Slack
              the way the memory rail sits at the far edge - a glance, not a feed. -->
+        <!-- The countdown panel is always shown; 1-4 meeting panels follow it,
+             per calendarPanelCount. hud.js sets each cal-ev-N's hidden state. -->
         <section class="col cal" id="col-calendar">
           <div class="cal-panel cal-countdown" id="cal-countdown">
             <span class="cal-count" id="cal-count">--</span>
             <span class="cal-unit" id="cal-unit"></span>
           </div>
-          <div class="cal-panel cal-event" id="cal-next">
-            <span class="cal-label">Next</span>
-            <span class="cal-title" id="cal-next-title"></span>
-            <span class="cal-when" id="cal-next-when"></span>
+          <div class="cal-panel cal-event" id="cal-ev-0">
+            <span class="cal-label" id="cal-ev-0-label"></span>
+            <span class="cal-title" id="cal-ev-0-title"></span>
+            <span class="cal-when" id="cal-ev-0-when"></span>
           </div>
-          <div class="cal-panel cal-event" id="cal-following">
-            <span class="cal-label">Then</span>
-            <span class="cal-title" id="cal-following-title"></span>
-            <span class="cal-when" id="cal-following-when"></span>
+          <div class="cal-panel cal-event" id="cal-ev-1">
+            <span class="cal-label" id="cal-ev-1-label"></span>
+            <span class="cal-title" id="cal-ev-1-title"></span>
+            <span class="cal-when" id="cal-ev-1-when"></span>
+          </div>
+          <div class="cal-panel cal-event" id="cal-ev-2">
+            <span class="cal-label" id="cal-ev-2-label"></span>
+            <span class="cal-title" id="cal-ev-2-title"></span>
+            <span class="cal-when" id="cal-ev-2-when"></span>
+          </div>
+          <div class="cal-panel cal-event" id="cal-ev-3">
+            <span class="cal-label" id="cal-ev-3-label"></span>
+            <span class="cal-title" id="cal-ev-3-title"></span>
+            <span class="cal-when" id="cal-ev-3-when"></span>
           </div>
         </section>
 

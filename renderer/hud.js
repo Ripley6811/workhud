@@ -338,17 +338,20 @@ function fmtWhen(ev) {
   return `${fmtTime(ev.startMs)} - ${fmtTime(ev.endMs)}`;
 }
 
-function paintEventPanel(prefix, ev) {
-  const panel = $(`cal-${prefix}`);
-  const title = $(`cal-${prefix}-title`);
-  const when = $(`cal-${prefix}-when`);
+function paintEventPanel(idx, ev, on) {
+  const panel = $(`cal-ev-${idx}`);
+  show(panel, on);
+  if (!on) return;
+  $(`cal-ev-${idx}-label`).textContent = idx === 0 ? 'Next' : 'Then';
   panel.classList.toggle('empty', !ev);
-  title.textContent = ev ? ev.title : 'Nothing scheduled';
-  when.textContent = fmtWhen(ev);
+  $(`cal-ev-${idx}-title`).textContent = ev ? ev.title : 'Nothing scheduled';
+  $(`cal-ev-${idx}-when`).textContent = fmtWhen(ev);
 }
 
 function paintCalendarColumn() {
   const c = state.calendar || {};
+  const upcoming = c.upcoming || [];
+  const next = upcoming[0] || null;
   const countEl = $('cal-count');
   const unitEl = $('cal-unit');
   countEl.className = 'cal-count';
@@ -359,17 +362,17 @@ function paintCalendarColumn() {
   } else if (c.error) {
     countEl.textContent = '--';
     unitEl.textContent = 'error';
-  } else if (!c.next) {
+  } else if (!next) {
     countEl.textContent = '--';
     unitEl.textContent = 'no events';
   } else {
     const now = Date.now();
-    if (now >= c.next.startMs && now < c.next.endMs) {
+    if (now >= next.startMs && now < next.endMs) {
       countEl.textContent = 'NOW';
       countEl.classList.add('now');
       unitEl.textContent = 'in progress';
     } else {
-      const mins = Math.max(0, Math.round((c.next.startMs - now) / 60000));
+      const mins = Math.max(0, Math.round((next.startMs - now) / 60000));
       if (mins < 60) {
         countEl.textContent = String(mins);
         unitEl.textContent = mins === 1 ? 'minute' : 'minutes';
@@ -384,8 +387,8 @@ function paintCalendarColumn() {
     }
   }
 
-  paintEventPanel('next', c.next);
-  paintEventPanel('following', c.following);
+  const panelCount = cfg.calendarPanelCount || 2;
+  for (let i = 0; i < 4; i++) paintEventPanel(i, upcoming[i] || null, i < panelCount);
 }
 
 function paintDash() {

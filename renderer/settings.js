@@ -45,6 +45,7 @@ for (const key of ['showGmail', 'showSlack', 'showCalendar', 'showMemory', 'show
 
 $('maxItems').addEventListener('change', (e) => save({ maxItems: Number(e.target.value) }));
 $('gmailQuery').addEventListener('change', (e) => save({ gmailQuery: e.target.value.trim() }));
+$('calendarPanelCount').addEventListener('change', (e) => save({ calendarPanelCount: Number(e.target.value) }, true));
 
 $('googleClientId').addEventListener('change', (e) => save({ google: { clientId: e.target.value.trim() } }));
 $('googleClientSecret').addEventListener('change', (e) => {
@@ -171,6 +172,7 @@ async function refresh() {
   $('activePollSeconds').value = cfg.activePollSeconds;
   $('maxItems').value = cfg.maxItems;
   $('gmailQuery').value = cfg.gmailQuery;
+  $('calendarPanelCount').value = cfg.calendarPanelCount;
   $('hudHeight').value = cfg.hudHeight;
   $('hudOpacity').value = Math.round(cfg.hudOpacity * 100);
   for (const fn of Object.values(paint)) fn();

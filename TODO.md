@@ -25,6 +25,9 @@ this file current, ticking items off and pruning them once they have shipped.
       the expanded dashboard, between mail and Slack, as specified. Collapsed
       bar and the vertical layout show/hide it correctly but haven't had the
       same layout attention as Gmail/Slack there.
+- [ ] **1-4 meeting panels is now user-set** (Settings, default 2) but only
+      verified in the preview harness at 2 and 4. 1 and 3 weren't screenshotted
+      - should be fine (same code path, just a loop bound) but not eyeballed.
 
 
 - [ ] **Never exercised against live Gmail or Slack.** Everything so far is
