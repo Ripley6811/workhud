@@ -116,11 +116,33 @@ Google's API needs an OAuth client that belongs to you. Once, in the browser:
 Sign-in happens in your real browser, so your existing Google session applies.
 The scope requested is `gmail.readonly` — WorkHUD cannot send or delete anything.
 
+## Connecting Calendar
+
+**Nothing extra to do.** Calendar rides on the exact same "Sign in with Google"
+above — same account, same OAuth client, one extra scope
+(`calendar.readonly`). If Gmail is connected, Calendar already is too.
+
+The one exception: if you connected *before* Calendar existed in WorkHUD, your
+saved token doesn't carry that scope yet. The Calendar column will show
+"reconnect" until you click **Sign in with Google** once more — that's Google
+handing over the new permission, not a broken connection or a second setup.
+
 ## Connecting Slack
 
-**Slack does not accept Google as a login for API access.** You authenticate to
-Slack in the browser (where your Google SSO applies), Slack issues its own token,
-and you paste that in once:
+Slack takes more steps than Google, and it is worth saying plainly why: Slack
+has no equivalent of "sign in with Google for a desktop app" for third-party
+tools. Every non-Slack-made app — WorkHUD included — has to be registered as
+its own Slack app first, even for one person's private use. That registration
+step is what steps 1-2 below are; there is no shorter path Slack offers.
+
+**Admin approval is not automatic** — it depends on your workspace's own
+settings, which WorkHUD has no way to see in advance. Many workspaces let any
+member install their own personal apps with no approval at all; some,
+especially at companies, restrict app installation to admins. Step 3 below is
+where you'd find out which kind yours is — if a request goes to your admin,
+that is Slack's own workspace policy asking, not anything WorkHUD is doing,
+and the app being registered is a private one only you can use, not something
+published or shared:
 
 1. [api.slack.com/apps](https://api.slack.com/apps) → **Create New App** → **From scratch**.
 2. **OAuth & Permissions** → add these under **User Token Scopes** (not *Bot* Token Scopes):
@@ -141,7 +163,7 @@ its own last-seen timestamp per conversation. "New" therefore means *since you
 last pressed Mark all seen*, not Slack's own unread badge. On first run it only
 looks back 24 hours rather than dumping history at you.
 
-## Calendar
+## What the calendar column shows
 
 A narrow column between mail and Slack in the expanded dashboard: a countdown
 to your next meeting is always shown, followed by 1-4 meeting panels
@@ -153,11 +175,6 @@ In the vertical layout the panels pivot to a horizontal row (countdown | Next
 | Then | Then) instead of stacking - the vertical layout already stacks whole
 columns full-width, so a tall stack of calendar panels would eat height the
 message lists want more.
-
-It shares the Gmail sign-in - no separate connection - but needs the
-`calendar.readonly` scope, which is only present on tokens issued after this
-existed. An older connection will ask you to sign in again once; that is the
-new permission being granted, not a broken connection.
 
 ## Polling, not push
 

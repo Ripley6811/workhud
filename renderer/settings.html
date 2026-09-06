@@ -52,7 +52,7 @@
       </ol>
       <p class="hint">A "Desktop app" client is what makes the loopback sign-in work. A "Web application" client will be rejected by Google.</p>
     </details>
-    <p class="hint">This same sign-in also covers Calendar. If you connected before Calendar existed, the column will ask you to sign in again once - that is the new permission, not a broken connection.</p>
+    <p class="hint"><b>Calendar needs nothing extra here</b> - this same sign-in covers it too, one extra permission on the same account. If you connected before Calendar existed, the column will ask you to sign in again once - that is the new permission being granted, not a broken connection.</p>
 
     <div class="field">
       <label for="googleClientId">Client ID</label>
@@ -77,7 +77,7 @@
   <!-- -------------------------------------------------------------- slack -->
   <section class="card">
     <h2>Slack <span class="badge" id="slackBadge">Not connected</span></h2>
-    <p class="note">Slack does not accept Google as a login for API access. You sign in to Slack in your browser (where your Google SSO applies), Slack issues its own token, and you paste it here once.</p>
+    <p class="note">Slack does not accept Google as a login for API access, so this takes more steps than Google did: Slack has no "sign in for a desktop app" shortcut, so every third-party tool - WorkHUD included - has to be registered as its own private Slack app first, even for just you. Whether that needs your admin's approval depends on your workspace's own settings, not on WorkHUD - many workspaces allow it with no approval at all.</p>
 
     <details>
       <summary>First time: create a Slack app and copy the user token</summary>
