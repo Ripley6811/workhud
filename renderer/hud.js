@@ -73,6 +73,22 @@ function setPreview(id, item, textOf) {
   node.appendChild(document.createTextNode(textOf(item)));
 }
 
+// A dot pulses while there is something unseen, and stops the moment you
+// hover the window - same as a phone's app-icon badge clearing when opened.
+// It resumes only when the count genuinely goes up again, not just because
+// you looked away; looking away is not "new mail arrived".
+const unreadTrack = { gmail: { ack: false, last: 0 }, slack: { ack: false, last: 0 } };
+function shouldPulseNew(key, ok, count) {
+  const t = unreadTrack[key];
+  if (count > t.last) t.ack = false;
+  t.last = count;
+  return !!(ok && count > 0 && !t.ack);
+}
+function acknowledgeUnread() {
+  unreadTrack.gmail.ack = true;
+  unreadTrack.slack.ack = true;
+}
+
 function paintBar() {
   if (!state || !cfg) return;
 
@@ -80,7 +96,8 @@ function paintBar() {
   show($('seg-gmail'), cfg.showGmail);
   $('gmail-count').textContent = g.ok ? String(g.count) : '--';
   $('gmail-count').classList.toggle('alert', !!(g.ok && g.count));
-  $('gmail-dot').className = `dot${g.needsSetup ? ' setup' : g.error ? ' err' : ''}`;
+  const gmailPulse = shouldPulseNew('gmail', g.ok, g.count);
+  $('gmail-dot').className = `dot${g.needsSetup ? ' setup' : g.error ? ' err' : gmailPulse ? ' new' : ''}`;
   $('seg-gmail').title = g.needsSetup ? 'Not connected - open Settings' : g.error || `Inbox: ${g.account || ''}`;
   setPreview('gmail-preview', (g.items || [])[0], (it) => it.subject);
 
@@ -103,7 +120,8 @@ function paintBar() {
   show($('seg-slack'), cfg.showSlack);
   $('slack-count').textContent = s.ok ? String(s.count) : '--';
   $('slack-count').classList.toggle('alert', !!(s.ok && s.count));
-  $('slack-dot').className = `dot${s.needsSetup ? ' setup' : s.error ? ' err' : ''}`;
+  const slackPulse = shouldPulseNew('slack', s.ok, s.count);
+  $('slack-dot').className = `dot${s.needsSetup ? ' setup' : s.error ? ' err' : slackPulse ? ' new' : ''}`;
   $('seg-slack').title = s.needsSetup ? 'Not connected - open Settings' : s.error || `Slack: ${s.account || ''}`;
   setPreview('slack-preview', (s.items || [])[0], (it) => it.text);
 
@@ -270,13 +288,16 @@ function paintGauge(g, free, total) {
 
 function buildMemoryDom(body) {
   body.replaceChildren();
-  const ram = gaugeRow('RAM');
-  body.appendChild(ram.row);
 
+  // Disks first, then RAM and its own process breakdown - the two RAM
+  // sections sit adjacent this way, rather than with Disks wedged between.
   const diskHead = el('div', 'section', 'Disks');
   const disks = el('div');
   body.appendChild(diskHead);
   body.appendChild(disks);
+
+  const ram = gaugeRow('RAM');
+  body.appendChild(ram.row);
 
   const procHead = el('div', 'section', 'RAM by process');
   const procs = el('div');
@@ -297,8 +318,7 @@ function paintMemoryColumn() {
   memoryDom.ram.row.title = `RAM - ${bytes(ramFree)} free of ${bytes(m.total)} (${pct(ramFrac)} free)`;
   $('memory-meta').textContent = '';
 
-  const wanted = new Set(cfg.diskFilter || []);
-  const disks = (m.disks || []).filter((d) => !wanted.size || wanted.has(d.name));
+  const disks = cfg.showDisks ? (m.disks || []) : [];
   show(memoryDom.diskHead, disks.length > 0);
 
   // Rows are rebuilt only when the set of drives changes. This panel repaints
@@ -465,6 +485,12 @@ window.hud.onPeek((on) => {
   peeking = on;
   applyMode();
   paintDash();
+});
+
+window.hud.onHover((over) => {
+  if (!over) return; // only "looked" clears anything; looking away does nothing
+  acknowledgeUnread();
+  paintBar();
 });
 
 window.hud.onState((s) => {

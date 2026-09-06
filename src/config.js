@@ -20,7 +20,8 @@ const DEFAULTS = {
   showCalendar: true,
   calendarPanelCount: 2,     // meeting panels below the countdown, 1-4
   showMemoryColumn: false,  // the rail's detail panel, opened by clicking it
-  diskFilter: [],           // drives to list; empty means every one found
+  showDisks: true,          // the DISKS section in the memory panel
+  processCount: 5,          // entries in "RAM by process", 1-20
   gmailQuery: 'is:unread in:inbox',
   maxItems: 25,
   slackMaxChannels: 25,
@@ -125,6 +126,7 @@ function save(partial) {
   next.hudHeight = Math.round(clamp(next.hudHeight, 28, 120, DEFAULTS.hudHeight));
   next.hudOpacity = clamp(next.hudOpacity, 0.3, 1, DEFAULTS.hudOpacity);
   next.calendarPanelCount = Math.round(clamp(next.calendarPanelCount, 1, 4, DEFAULTS.calendarPanelCount));
+  next.processCount = Math.round(clamp(next.processCount, 1, 20, DEFAULTS.processCount));
   cache = next;
   fs.mkdirSync(path.dirname(file()), { recursive: true });
   fs.writeFileSync(file(), JSON.stringify(encodeSecrets(next), null, 2), { mode: 0o600 });

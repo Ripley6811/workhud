@@ -38,12 +38,13 @@ paint.activePollSeconds = bindRange('activePollSeconds', 'activePollSeconds',
 paint.hudHeight = bindRange('hudHeight', 'hudHeight', (v) => `${v} px`);
 paint.hudOpacity = bindRange('hudOpacity', 'hudOpacity', (v) => `${v}%`, (v) => v / 100);
 
-for (const key of ['showGmail', 'showSlack', 'showCalendar', 'showMemory', 'showMemoryColumn',
+for (const key of ['showGmail', 'showSlack', 'showCalendar', 'showMemory', 'showMemoryColumn', 'showDisks',
                    'launchAtLogin', 'slackOpenInBrowser', 'pinned', 'expanded', 'hoverPeek', 'showInTaskbar', 'vertical']) {
   bindCheckbox(key, key);
 }
 
 $('maxItems').addEventListener('change', (e) => save({ maxItems: Number(e.target.value) }));
+$('processCount').addEventListener('change', (e) => save({ processCount: Number(e.target.value) }, true));
 $('gmailQuery').addEventListener('change', (e) => save({ gmailQuery: e.target.value.trim() }));
 $('calendarPanelCount').addEventListener('change', (e) => save({ calendarPanelCount: Number(e.target.value) }, true));
 
@@ -113,44 +114,6 @@ $('slackDisconnect').addEventListener('click', async () => {
   await refresh();
 });
 
-// Drive checkboxes are built from whatever is actually mounted. All ticked is
-// stored as an empty filter, so a drive plugged in later shows up on its own.
-async function renderDisks() {
-  const box = $('diskList');
-  const drives = await window.hud.listDisks();
-  box.replaceChildren();
-  if (!drives.length) {
-    const none = document.createElement('span');
-    none.className = 'none';
-    none.textContent = 'No drives detected.';
-    box.appendChild(none);
-    return;
-  }
-  const filter = new Set(cfg.diskFilter || []);
-  for (const d of drives) {
-    const wrap = document.createElement('span');
-    wrap.className = 'drive';
-    const input = document.createElement('input');
-    input.type = 'checkbox';
-    input.id = `disk-${d.name}`;
-    input.checked = !filter.size || filter.has(d.name);
-    input.addEventListener('change', () => {
-      const checked = [...box.querySelectorAll('input:checked')].map((n) => n.dataset.name);
-      save({ diskFilter: checked.length === drives.length ? [] : checked }, true);
-    });
-    input.dataset.name = d.name;
-    const label = document.createElement('label');
-    label.htmlFor = input.id;
-    label.textContent = d.name;
-    const cap = document.createElement('span');
-    cap.className = 'cap';
-    const gb = d.total / 1024 ** 3;
-    cap.textContent = gb >= 1024 ? `${(gb / 1024).toFixed(1)} TB` : `${Math.round(gb)} GB`;
-    wrap.append(input, label, cap);
-    box.appendChild(wrap);
-  }
-}
-
 $('resetPosition').addEventListener('click', () => window.hud.resetPosition());
 $('refreshNow').addEventListener('click', () => window.hud.pollNow());
 $('quitApp').addEventListener('click', () => window.hud.quit());
@@ -171,13 +134,14 @@ async function refresh() {
   $('pollMinutes').value = cfg.pollMinutes;
   $('activePollSeconds').value = cfg.activePollSeconds;
   $('maxItems').value = cfg.maxItems;
+  $('processCount').value = cfg.processCount;
   $('gmailQuery').value = cfg.gmailQuery;
   $('calendarPanelCount').value = cfg.calendarPanelCount;
   $('hudHeight').value = cfg.hudHeight;
   $('hudOpacity').value = Math.round(cfg.hudOpacity * 100);
   for (const fn of Object.values(paint)) fn();
 
-  for (const key of ['showGmail', 'showSlack', 'showCalendar', 'showMemory', 'showMemoryColumn',
+  for (const key of ['showGmail', 'showSlack', 'showCalendar', 'showMemory', 'showMemoryColumn', 'showDisks',
                      'launchAtLogin', 'slackOpenInBrowser', 'pinned', 'expanded', 'hoverPeek', 'showInTaskbar', 'vertical']) {
     $(key).checked = !!cfg[key];
   }
@@ -204,7 +168,6 @@ async function refresh() {
     ? 'Tokens are encrypted at rest with your operating system keychain.'
     : 'Warning: no OS keychain is available, so tokens will not be saved between launches.';
 
-  await renderDisks();
 }
 
 // Surface poll errors here too, so a broken connection is visible where you fix it.

@@ -54,9 +54,18 @@ async function fetch_() {
   if (res.status === 403 || res.status === 401) {
     const body = await res.json().catch(() => ({}));
     const msg = body.error?.message || '';
-    // A token from before calendar.readonly was added still authenticates
-    // fine for Gmail, so this only ever shows up here, not as a sign-in error.
-    if (/insufficient|scope/i.test(msg) || res.status === 403) {
+    // Google Calendar returns 403 for two unrelated problems, and only one of
+    // them is fixed by signing in again:
+    //   - a token from before calendar.readonly was added: "insufficient
+    //     authentication scopes" / "insufficient permission"
+    //   - the Calendar API simply isn't enabled on this Cloud project: "has
+    //     not been used in project ... or it is disabled" (reason
+    //     accessNotConfigured) - re-consenting changes nothing here; the fix
+    //     is enabling the API in Cloud Console, same as Gmail needed.
+    // Treating every 403 as the first case (as this once did) hid the real
+    // message for the second and told people to "sign in again" for
+    // something sign-in cannot fix.
+    if (/insufficient.{0,20}(scope|permission)/i.test(msg)) {
       return {
         ok: false, needsReconsent: true,
         error: 'Calendar access needs a fresh sign-in (new permission added).',

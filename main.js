@@ -33,6 +33,7 @@ let peeking = false;
 let peekSuppressed = false;
 let hoverTimer = null;
 let hoverLogged = null; // WORKHUD_DEBUG only: log edges, not every tick
+let windowHovered = false; // cursor anywhere over the window, not just the bar
 
 
 const state = {
@@ -165,10 +166,22 @@ function setPeek(on) {
 function checkHover() {
   if (!hud || hud.isDestroyed() || !hud.isVisible()) return;
   const cfg = config.load();
-  if (!cfg.hoverPeek || cfg.expanded) { setPeek(false); return; }
-
   const p = screen.getCursorScreenPoint();
   const b = hud.getBounds();
+
+  // Whether the pointer is anywhere over the window at all, independent of
+  // hover-peek or expanded/collapsed mode - the renderer uses this only to
+  // know "the user looked", e.g. to stop a pulsing new-item dot the way a
+  // phone's badge clears when you open the app. Computed unconditionally, so
+  // it still works with hover-peek switched off or while expanded, unlike the
+  // bar-only peek check below.
+  const overWindow = p.x >= b.x && p.x < b.x + b.width && p.y >= b.y && p.y < b.y + b.height;
+  if (overWindow !== windowHovered) {
+    windowHovered = overWindow;
+    hud.webContents.send('hover', windowHovered);
+  }
+
+  if (!cfg.hoverPeek || cfg.expanded) { setPeek(false); return; }
   // Only the bar strip peeks, and it closes the moment you leave it. The
   // dashboard it reveals is a glance, not somewhere to wander into - clicking
   // is what makes it stay.
@@ -337,7 +350,7 @@ async function poll(reason = 'timer') {
   );
 
   jobs.push(
-    memory.sample({ withDetail: true })
+    memory.sample({ withDetail: true, processCount: cfg.processCount })
       .then((r) => { state.memory = r; })
       .catch((e) => { state.memory = { ok: false, error: e.message, pct: 0, history: [] }; })
   );

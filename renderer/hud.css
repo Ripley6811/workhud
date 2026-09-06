@@ -90,12 +90,15 @@ body.expanded #bar { border-bottom: 1px solid var(--line); }
 .count.alert { color: var(--accent); }
 .label { color: var(--muted); flex: 0 0 auto; }
 
-.dot { flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%; background: transparent; }
+.dot { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%; background: transparent; }
 .dot.err { background: var(--bad); }
 .dot.setup { background: var(--warn); }
 /* A meeting actually happening right now, not just a status indicator - reads
    as a heartbeat rather than a static warning colour. */
 .dot.now { background: var(--bad); animation: dot-pulse 1.6s ease-in-out infinite; }
+/* Something new since you last looked - stops the moment you look (hovering
+   the window), same as the badge on a phone's app icon clearing on open. */
+.dot.new { background: var(--accent); animation: dot-pulse 1.6s ease-in-out infinite; }
 @keyframes dot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.15; } }
 
 /* Hugs its content instead of sharing the bar equally with Inbox/Slack - it
@@ -494,3 +497,12 @@ body.vertical #rail-text {
   transform: none;
   gap: 8px;
 }
+
+/* ------------------------------------------------------------- scrollbars */
+/* Chromium's default scrollbar is light grey and clashes with the dark
+   theme everywhere else. Styled the same in both renderers. */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.16); border-radius: 6px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.28); background-clip: padding-box; }
+::-webkit-scrollbar-corner { background: transparent; }

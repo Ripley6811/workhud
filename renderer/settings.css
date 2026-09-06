@@ -113,8 +113,11 @@ button.danger:hover { border-color: var(--bad); color: var(--bad); }
 .status.err { color: var(--bad); }
 .status.ok { color: var(--ok); }
 
-.disk-list { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 4px 0 2px; }
-.disk-list label { margin: 0; color: var(--fg); font-size: 13.5px; }
-.disk-list .drive { display: flex; align-items: center; gap: 7px; }
-.disk-list .cap { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
-.disk-list .none { color: var(--muted); font-size: 12.5px; }
+/* ------------------------------------------------------------- scrollbars */
+/* Chromium's default scrollbar is light grey and clashes with the dark
+   theme everywhere else. Styled the same in both renderers. */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.16); border-radius: 6px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.28); background-clip: padding-box; }
+::-webkit-scrollbar-corner { background: transparent; }

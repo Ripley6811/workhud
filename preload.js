@@ -26,4 +26,5 @@ contextBridge.exposeInMainWorld('hud', {
   onState: (cb) => ipcRenderer.on('state', (_e, s) => cb(s)),
   onMemory: (cb) => ipcRenderer.on('memory', (_e, m) => cb(m)),
   onPeek: (cb) => ipcRenderer.on('peek', (_e, on) => cb(on)),
+  onHover: (cb) => ipcRenderer.on('hover', (_e, over) => cb(over)),
 });

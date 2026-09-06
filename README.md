@@ -106,7 +106,12 @@ way back if the window ends up off-screen.
 Google's API needs an OAuth client that belongs to you. Once, in the browser:
 
 1. [console.cloud.google.com](https://console.cloud.google.com/) → create a project.
-2. **APIs & Services → Library** → enable **Gmail API**.
+2. **APIs & Services → Library** → enable **Gmail API**, then separately enable
+   **Google Calendar API** too - each API a Cloud project uses has to be
+   individually turned on, even though both end up on the same OAuth client.
+   Skipping this one is the single most common way Calendar breaks: it fails
+   with a 403 that has nothing to do with sign-in, so re-connecting won't fix
+   it, only enabling the API here will.
 3. **OAuth consent screen** → *Internal* if your work account allows it, otherwise
    *External* with your own address under **Test users**.
 4. **Credentials → Create credentials → OAuth client ID** → application type
@@ -126,6 +131,10 @@ The one exception: if you connected *before* Calendar existed in WorkHUD, your
 saved token doesn't carry that scope yet. The Calendar column will show
 "reconnect" until you click **Sign in with Google** once more — that's Google
 handing over the new permission, not a broken connection or a second setup.
+
+If it instead shows a plain error (not "reconnect"), the likely cause is step
+2 above — **Google Calendar API** enabled separately from Gmail API on your
+Cloud project. Re-signing in won't fix that; enabling the API will.
 
 ## Connecting Slack
 

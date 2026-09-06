@@ -139,7 +139,7 @@ function merge(rows, n) {
 
 // `withDetail` adds the process list and disk figures, which are only worth
 // gathering on the slow poll. The fast 5s tick asks for memory alone.
-async function sample({ withDetail = false } = {}) {
+async function sample({ withDetail = false, processCount = 5 } = {}) {
   const { total, used } = await usedBytes();
   const pct = total ? used / total : 0;
   history.push(pct);
@@ -150,7 +150,7 @@ async function sample({ withDetail = false } = {}) {
   // caller merges this over the last reading, and an explicit `undefined` would
   // wipe the good values it is merging onto.
   if (withDetail) {
-    out.processes = await topProcesses();
+    out.processes = await topProcesses(processCount);
     out.disks = await disks();
   }
   return out;

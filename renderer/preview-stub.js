@@ -61,6 +61,9 @@ const FAKE_STATE = {
       { name: 'slack', bytes: 1180000000 },
       { name: 'java', bytes: 902000000 },
       { name: 'Docker Desktop', bytes: 744000000 },
+      { name: 'Discord', bytes: 512000000 },
+      { name: 'WorkHUD', bytes: 210000000 },
+      { name: 'explorer', bytes: 165000000 },
     ],
   },
 };
@@ -81,7 +84,8 @@ const FAKE_CONFIG = {
   pollMinutes: 3,
   activePollSeconds: 60,
   maxItems: 25,
-  diskFilter: [],
+  processCount: 5,
+  showDisks: true,
 };
 
 window.hud = {
@@ -98,4 +102,5 @@ window.hud = {
   onState: () => {},
   onMemory: () => {},
   onPeek: () => {},
+  onHover: () => {},
 };

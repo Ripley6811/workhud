@@ -45,7 +45,7 @@
       <summary>First time: create a Google OAuth client (about 3 minutes)</summary>
       <ol>
         <li>Open <a href="https://console.cloud.google.com/" data-ext>console.cloud.google.com</a> and create a project (any name).</li>
-        <li><b>APIs &amp; Services &rarr; Library</b>: search for <b>Gmail API</b> and enable it.</li>
+        <li><b>APIs &amp; Services &rarr; Library</b>: search for <b>Gmail API</b> and enable it, then separately search for <b>Google Calendar API</b> and enable that too - each API a project uses needs enabling on its own, even sharing one OAuth client. Skipping this is the most common way Calendar breaks: a 403 that re-signing in cannot fix.</li>
         <li><b>OAuth consent screen</b>: choose <b>Internal</b> if your work account allows it, otherwise <b>External</b> and add your own address under <b>Test users</b>.</li>
         <li><b>Credentials &rarr; Create credentials &rarr; OAuth client ID</b>. Application type must be <b>Desktop app</b>.</li>
         <li>Copy the client ID and client secret into the two boxes below.</li>
@@ -131,11 +131,11 @@
       </select>
     </div>
     <div class="field checkbox"><input type="checkbox" id="showMemoryColumn"><label for="showMemoryColumn">Show the memory detail panel (clicking the rail toggles this)</label></div>
-
+    <div class="field checkbox"><input type="checkbox" id="showDisks"><label for="showDisks">Show disk space in that panel</label></div>
+    <p class="hint">With disk space off, the panel is just RAM and the heaviest processes.</p>
     <div class="field">
-      <label>Drives listed in that panel</label>
-      <div id="diskList" class="disk-list"></div>
-      <p class="hint">The panel shows system memory, then disk space per drive, then the heaviest processes. With every drive ticked, any new one you plug in appears automatically.</p>
+      <label for="processCount">Processes listed under "RAM by process"</label>
+      <input type="number" id="processCount" min="1" max="20">
     </div>
 
     <div class="field">
