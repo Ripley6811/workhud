@@ -149,6 +149,11 @@ to your next meeting is always shown, followed by 1-4 meeting panels
 a countdown and the next meeting's title, the same shape as the Inbox/Slack
 segments - so the setting has a visible effect in both modes.
 
+In the vertical layout the panels pivot to a horizontal row (countdown | Next
+| Then | Then) instead of stacking - the vertical layout already stacks whole
+columns full-width, so a tall stack of calendar panels would eat height the
+message lists want more.
+
 It shares the Gmail sign-in - no separate connection - but needs the
 `calendar.readonly` scope, which is only present on tokens issued after this
 existed. An older connection will ask you to sign in again once; that is the

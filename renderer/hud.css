@@ -444,8 +444,25 @@ body.vertical .col.narrow { flex: 0 0 auto; }
 body.vertical .col.narrow .col-body { flex: 0 0 auto; overflow: visible; }
 /* Stacked, the 3 calendar panels keep a fixed, readable height each rather
    than stretching to fill whatever the column has left. */
-body.vertical .col.cal { flex: 0 0 auto; }
-body.vertical .cal-panel { flex: 0 0 auto; padding: 10px; }
+/* Stacked, a tall column of panels would eat height the message lists want
+   more. Pivoted to a row instead: countdown | Next | Then | Then, sharing
+   width the way the panels already share height in the horizontal layout -
+   flex:1 1 0 needs no override, only the axis and the border direction do.
+   Not touching `display` here matters: body.vertical .col.cal would otherwise
+   out-specificity .col.cal[hidden]'s display:none (same element+class count,
+   and this selector carries one more element - "body" - which breaks the tie
+   in its favour), silently undoing the toggle fix whenever vertical mode is
+   also on. */
+body.vertical .col.cal { flex: 0 0 auto; flex-direction: row; }
+body.vertical .cal-panel {
+  min-height: auto;
+  min-width: 0;
+  padding: 6px 8px;
+  border-bottom: 0;
+  border-right: 1px solid var(--line);
+}
+body.vertical .cal-panel:last-child { border-right: 0; }
+body.vertical .cal-count { font-size: 20px; }
 
 body.vertical #rail {
   flex: 0 0 var(--rail-w);
