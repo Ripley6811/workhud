@@ -37,6 +37,38 @@ npm start
 Node 18+ is required for `npm install`; the app itself runs on the Node that
 ships inside Electron.
 
+### On the MacBook
+
+```bash
+git clone https://github.com/Ripley6811/workhud.git
+cd workhud
+npm install
+npm start
+```
+
+Needs Node 18+ (`brew install node` if you don't have it) and `git` (Xcode's
+Command Line Tools provide it - macOS usually prompts to install them the
+first time you run `git`). No Xcode project, no native modules to compile.
+
+`npm start` runs the app straight from source - no packaged `.app`, so no
+Gatekeeper prompt. `npm run dist:mac` builds a double-clickable `.app`, but
+since it isn't code-signed or notarized, Gatekeeper will call it "damaged" or
+from an "unidentified developer"; either right-click it and choose Open, or
+run `xattr -cr` on the built `.app` first. `npm start` is the simpler path
+until that's worth setting up.
+
+Settings, connections and tokens are per-machine (encrypted via the macOS
+Keychain there instead of Windows DPAPI) - sign in to Google and Slack again
+on the Mac; nothing carries over from Windows. A work Google Workspace
+account may need admin approval for a new OAuth client, same as any other
+Google Workspace app.
+
+macOS-specific code (the `vm_stat`-based memory reading, `app.dock.hide()`,
+the `type: 'panel'` window, `/Volumes` disk enumeration, the template tray
+icon) is written but has never actually run there yet - see
+[TODO.md](TODO.md). If memory/disk numbers look wrong or the Dock/tray
+behaves oddly, that is the most likely place to look first.
+
 To build an installer for the machine you are on:
 
 ```bash
