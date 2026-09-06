@@ -42,24 +42,49 @@ of your system Node version.
 
 ### On the MacBook
 
+To launch it like any other app - from Launchpad, Spotlight, or the
+Applications folder:
+
 ```bash
 git clone https://github.com/Ripley6811/workhud.git
 cd workhud
 npm install
+npm run dist:mac
+```
+
+That builds `dist/WorkHUD-<version>.dmg`. Open it, drag **WorkHUD.app** onto
+the **Applications** shortcut shown in the same window, then eject the disk
+image (the small eject icon next to it in Finder's sidebar, or right-click →
+Eject). It's a real, permanent copy in `/Applications` at that point -
+Spotlight and Launchpad pick it up immediately, no extra step.
+
+**First launch only:** since the build isn't code-signed or notarized (that
+needs a paid Apple Developer account, which this project doesn't have),
+Gatekeeper will refuse a plain double-click, calling it "damaged" or from an
+"unidentified developer." Instead: right-click **WorkHUD** in
+Applications/Launchpad → **Open** → confirm in the dialog that appears. That
+one right-click is only needed the very first time; a plain double-click or
+Spotlight launch works normally after that. (If it still refuses, run
+`xattr -cr /Applications/WorkHUD.app` in Terminal once, then try again.)
+
+Prefer to just try it from source first, no build step, no Gatekeeper at all:
+
+```bash
 npm start
 ```
 
-Needs Node 18+ (whatever `brew install node` gives you is fine - don't seek
-out 18 specifically) and `git` (Xcode's
-Command Line Tools provide it - macOS usually prompts to install them the
-first time you run `git`). No Xcode project, no native modules to compile.
+runs the app straight from source in a terminal window - useful for a quick
+look, but it's not what ends up in Applications/Launchpad, and closing the
+terminal it's running in also closes the app.
 
-`npm start` runs the app straight from source - no packaged `.app`, so no
-Gatekeeper prompt. `npm run dist:mac` builds a double-clickable `.app`, but
-since it isn't code-signed or notarized, Gatekeeper will call it "damaged" or
-from an "unidentified developer"; either right-click it and choose Open, or
-run `xattr -cr` on the built `.app` first. `npm start` is the simpler path
-until that's worth setting up.
+Building needs Node 18+ (whatever `brew install node` gives you is fine -
+don't seek out 18 specifically) and `git` (Xcode's Command Line Tools provide
+it - macOS usually prompts to install them the first time you run `git`). No
+Xcode project, no native modules to compile.
+
+Once it's a real app in Applications, Settings → **Start WorkHUD when I log
+in** actually behaves like it should - launching from source with `npm start`
+has no session to re-launch into.
 
 Settings, connections and tokens are per-machine (encrypted via the macOS
 Keychain there instead of Windows DPAPI) - sign in to Google and Slack again
