@@ -94,11 +94,10 @@ function paintBar() {
   if (parts.now) calCount.classList.add('alert');
   calCount.textContent = parts.count;
   $('cal-bar-unit').textContent = parts.unit;
-  $('cal-bar-dot').className = `dot${c.needsSetup || c.needsReconsent ? ' setup' : c.error ? ' err' : ''}`;
+  $('cal-bar-dot').className = `dot${c.needsSetup || c.needsReconsent ? ' setup' : c.error ? ' err' : parts.now ? ' now' : ''}`;
   $('seg-calendar').title = c.needsSetup ? 'Not connected - open Settings'
     : c.needsReconsent ? 'Sign in with Google again to grant Calendar access'
     : c.error || (next ? next.title : 'No upcoming events');
-  $('cal-bar-preview').textContent = next ? next.title : '';
 
   const s = state.slack || {};
   show($('seg-slack'), cfg.showSlack);

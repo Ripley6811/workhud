@@ -93,6 +93,14 @@ body.expanded #bar { border-bottom: 1px solid var(--line); }
 .dot { flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%; background: transparent; }
 .dot.err { background: var(--bad); }
 .dot.setup { background: var(--warn); }
+/* A meeting actually happening right now, not just a status indicator - reads
+   as a heartbeat rather than a static warning colour. */
+.dot.now { background: var(--bad); animation: dot-pulse 1.6s ease-in-out infinite; }
+@keyframes dot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.15; } }
+
+/* Hugs its content instead of sharing the bar equally with Inbox/Slack - it
+   carries only a countdown, so it should read as a short, glance-able chip. */
+.seg.compact { flex: 0 0 auto; }
 
 .preview {
   flex: 1 1 auto;
