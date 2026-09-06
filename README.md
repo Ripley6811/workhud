@@ -34,8 +34,11 @@ npm install
 npm start
 ```
 
-Node 18+ is required for `npm install`; the app itself runs on the Node that
-ships inside Electron.
+Node 18 or newer for `npm install` - "or newer" means exactly that, whatever
+current version you have (24, or later) is fine and preferred over anything
+older. The floor is only about `npm install`/npm itself behaving predictably;
+the app's own code runs inside Electron's bundled Node at runtime, regardless
+of your system Node version.
 
 ### On the MacBook
 
@@ -46,7 +49,8 @@ npm install
 npm start
 ```
 
-Needs Node 18+ (`brew install node` if you don't have it) and `git` (Xcode's
+Needs Node 18+ (whatever `brew install node` gives you is fine - don't seek
+out 18 specifically) and `git` (Xcode's
 Command Line Tools provide it - macOS usually prompts to install them the
 first time you run `git`). No Xcode project, no native modules to compile.
 
